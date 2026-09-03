@@ -8,12 +8,7 @@ const { t } = useI18n();
   <section>
     <h1>{{ t('search.title') }}</h1>
     <label for="search-input" class="sr-only">{{ t('search.title') }}</label>
-    <input
-      id="search-input"
-      type="search"
-      :placeholder="t('search.placeholder')"
-      disabled
-    />
+    <input id="search-input" type="search" :placeholder="t('search.placeholder')" disabled />
     <p class="todo">{{ t('search.todo') }}</p>
   </section>
 </template>

@@ -44,7 +44,7 @@ Objectif : le repo est prêt à accueillir du code, tout démarre en local.
 - [x] `.gitignore` (Node, IDE, env)
 - [x] `.env.example` racine
 - [x] `.prettierrc` + `.prettierignore`
-- [ ] ESLint config partagée (`eslint.config.mjs`)
+- [x] ESLint config partagée (`eslint.config.mjs`)
 - [x] `docker-compose.yml` : PostgreSQL + Redis + volumes persistants
 - [x] Script `pnpm dev` qui lance API + Web en parallèle
 - [x] Documentation minimale d'onboarding dans le README
@@ -224,12 +224,12 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ## Phase 7 — Qualité & CI
 
-- [ ] Tests unitaires : services backend + composants critiques Vue
-- [ ] Tests d'intégration API (Vitest + supertest ou undici)
+- [~] Tests unitaires : Vitest configuré ; tests d'amorçage sur `packages/validation`, `packages/config`, `apps/api` (health). Couverture à étendre au fil des features.
+- [~] Tests d'intégration API : `GET /health` couvert via `app.inject()`. Reste : auth, articles, commentaires (à faire au fil des phases).
 - [ ] Tests e2e minimaux (Playwright) sur les parcours publics
-- [ ] GitHub Actions : lint + type-check + test + build sur PR
-- [ ] Vérification des migrations en CI (Prisma `migrate diff`)
-- [ ] Hooks pre-commit (Husky + lint-staged) — optionnel
+- [x] GitHub Actions : lint + type-check + tests + build sur PR (`.github/workflows/ci.yml`)
+- [x] Vérification des migrations en CI (Prisma `validate` + `format --check`)
+- [x] Hooks pre-commit (Husky + lint-staged) — Prettier + ESLint --fix sur les fichiers stagés
 
 ---
 
@@ -255,8 +255,8 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ## Jalons
 
-- **M0 — Site vierge qui démarre** ✅ *code en place* — reste à exécuter en local : `pnpm install`, `pnpm docker:up`, `pnpm db:migrate`, `pnpm dev`.
-- **M1 — Authentification & RBAC** *(prochaine cible)* : login/logout, rôles, garde routes admin.
+- **M0 — Site vierge qui démarre** ✅ _code en place_ — reste à exécuter en local : `pnpm install`, `pnpm docker:up`, `pnpm db:migrate`, `pnpm dev`.
+- **M1 — Authentification & RBAC** _(prochaine cible)_ : login/logout, rôles, garde routes admin.
 - **M2 — Backoffice minimal** : gestion des sources, des catégories, création manuelle d'article.
 - **M3 — Interface publique** : liste d'articles + article détaillé + commentaires + i18n.
 - **M4 — Agrégation RSS** : worker aggregator + propositions dans le back-office.

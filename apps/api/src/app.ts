@@ -8,25 +8,25 @@ import { config } from './config.js';
 import { registerHealthRoutes } from './health/routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
-    const app = Fastify({
-        logger: {
-            level: config.API_LOG_LEVEL,
-            transport:
-                config.NODE_ENV === 'development'
-                    ? { target: 'pino-pretty', options: { colorize: true } }
-                    : undefined,
-        },
-    });
+  const loggerOptions =
+    config.NODE_ENV === 'development'
+      ? {
+          level: config.API_LOG_LEVEL,
+          transport: { target: 'pino-pretty', options: { colorize: true } },
+        }
+      : { level: config.API_LOG_LEVEL };
 
-    await app.register(sensible);
-    await app.register(helmet, { global: true });
-    await app.register(cors, {
-        origin: config.API_CORS_ORIGIN.split(',').map((o) => o.trim()),
-        credentials: true,
-    });
-    await app.register(rateLimit, { max: 200, timeWindow: '1 minute' });
+  const app: FastifyInstance = Fastify({ logger: loggerOptions });
 
-    await app.register(registerHealthRoutes);
+  await app.register(sensible);
+  await app.register(helmet, { global: true });
+  await app.register(cors, {
+    origin: config.API_CORS_ORIGIN.split(',').map((o) => o.trim()),
+    credentials: true,
+  });
+  await app.register(rateLimit, { max: 200, timeWindow: '1 minute' });
 
-    return app;
+  await app.register(registerHealthRoutes);
+
+  return app;
 }

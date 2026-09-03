@@ -2,6 +2,9 @@
 
 > **L'actualité religieuse dans le monde**
 
+[![CI](https://github.com/ElenaFri/orbis_fidei/actions/workflows/ci.yml/badge.svg)](https://github.com/ElenaFri/orbis_fidei/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ElenaFri/orbis_fidei/graph/badge.svg?token=7LQOKQAesk)](https://codecov.io/gh/ElenaFri/orbis_fidei)
+
 Orbis Fidei est un portail international d'actualités religieuses, disponible en français, anglais et russe.
 
 Le projet vise à agréger automatiquement des informations provenant de médias chrétiens du monde entier, à les soumettre à une équipe de modération, puis à publier des contenus vérifiés et édités dans les trois langues du portail.

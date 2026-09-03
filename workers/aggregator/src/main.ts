@@ -1,33 +1,38 @@
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { loadRootEnv } from '@orbis-fidei/config';
 import { QUEUES, createRedisConnection, createWorker } from '@orbis-fidei/queue';
 import pino from 'pino';
 
-const logger = pino({
-    transport:
-        process.env.NODE_ENV === 'production'
-            ? undefined
-            : { target: 'pino-pretty', options: { colorize: true } },
-});
+loadRootEnv(dirname(fileURLToPath(import.meta.url)));
+
+const logger = pino(
+  process.env.NODE_ENV === 'production'
+    ? {}
+    : { transport: { target: 'pino-pretty', options: { colorize: true } } },
+);
 
 const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
 const connection = createRedisConnection(redisUrl);
 
 const worker = createWorker(
-    QUEUES.AGGREGATION,
-    async (job) => {
-        logger.info({ jobId: job.id, name: job.name }, 'aggregation job received (stub)');
-        // Implémenté dans une phase ultérieure : fetch RSS/Atom, déduplication, création SourceItem.
-        return { ok: true };
-    },
-    connection,
+  QUEUES.AGGREGATION,
+  async (job) => {
+    logger.info({ jobId: job.id, name: job.name }, 'aggregation job received (stub)');
+    // Implémenté dans une phase ultérieure : fetch RSS/Atom, déduplication, création SourceItem.
+    return { ok: true };
+  },
+  connection,
 );
 
 worker.on('ready', () => logger.info('aggregator worker ready'));
 worker.on('failed', (job, err) => logger.error({ jobId: job?.id, err }, 'job failed'));
 
 const shutdown = async (signal: string): Promise<void> => {
-    logger.info({ signal }, 'shutting down aggregator');
-    await worker.close();
-    process.exit(0);
+  logger.info({ signal }, 'shutting down aggregator');
+  await worker.close();
+  process.exit(0);
 };
 
 process.on('SIGINT', () => void shutdown('SIGINT'));
