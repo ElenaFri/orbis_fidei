@@ -1,0 +1,33 @@
+{
+    "name": "orbis-fidei",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Portail international d'actualités religieuses (FR/EN/RU)",
+    "license": "SEE LICENSE IN LICENSE",
+    "packageManager": "pnpm@9.12.0",
+    "engines": {
+        "node": ">=20.11.0",
+        "pnpm": ">=9.0.0"
+    },
+    "scripts": {
+        "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+        "build": "pnpm -r build",
+        "lint": "pnpm -r lint",
+        "typecheck": "pnpm -r typecheck",
+        "test": "pnpm -r test",
+        "format": "prettier --write \"**/*.{ts,tsx,vue,js,json,md,yml,yaml}\"",
+        "format:check": "prettier --check \"**/*.{ts,tsx,vue,js,json,md,yml,yaml}\"",
+        "docker:up": "docker compose up -d",
+        "docker:down": "docker compose down",
+        "docker:logs": "docker compose logs -f",
+        "db:migrate": "pnpm --filter @orbis-fidei/database migrate",
+        "db:reset": "pnpm --filter @orbis-fidei/database reset",
+        "db:seed": "pnpm --filter @orbis-fidei/database seed",
+        "db:studio": "pnpm --filter @orbis-fidei/database studio"
+    },
+    "devDependencies": {
+        "@types/node": "^20.14.0",
+        "prettier": "^3.3.3",
+        "typescript": "^5.5.4"
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "name": "@orbis-fidei/web",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc --noEmit && vite build",
+        "preview": "vite preview",
+        "typecheck": "vue-tsc --noEmit",
+        "lint": "echo 'lint not configured yet'",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "pinia": "^2.2.2",
+        "vue": "^3.5.0",
+        "vue-i18n": "^9.14.0",
+        "vue-router": "^4.4.3"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.1.2",
+        "typescript": "^5.5.4",
+        "vite": "^5.4.2",
+        "vitest": "^2.0.5",
+        "vue-tsc": "^2.1.4"
+    }
+}

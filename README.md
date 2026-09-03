@@ -8,7 +8,76 @@ Le projet vise à agréger automatiquement des informations provenant de médias
 
 L'automatisation intervient dans la collecte, l'analyse et la traduction, mais la publication reste sous contrôle humain.
 
-## Table des matières
+---
+
+## Démarrage rapide (développement local)
+
+**Pré-requis** : Node.js ≥ 20.11, [pnpm](https://pnpm.io/) ≥ 9, Docker + Docker Compose.
+
+```bash
+# 1. Installer les dépendances
+pnpm install
+
+# 2. Copier la configuration
+cp .env.example .env
+
+# 3. Démarrer PostgreSQL et Redis
+pnpm docker:up
+
+# 4. Générer le client Prisma + appliquer les migrations + seed
+pnpm db:migrate
+pnpm db:seed
+
+# 5. Lancer l'API et le frontend en parallèle
+pnpm dev
+```
+
+Une fois lancé :
+
+- Frontend : <http://localhost:5173>
+- API : <http://localhost:3001>
+- Endpoint santé : <http://localhost:3001/health>
+
+**Workers** (dans des terminaux séparés, quand la file de tâches sera utilisée) :
+
+```bash
+pnpm --filter @orbis-fidei/aggregator dev
+pnpm --filter @orbis-fidei/analyzer   dev
+pnpm --filter @orbis-fidei/translator dev
+```
+
+Voir [TODO.md](TODO.md) pour la feuille de route détaillée.
+
+---
+
+## Structure du dépôt
+
+```text
+orbis-fidei/
+├── apps/
+│   ├── api/           # Backend Fastify + TypeScript
+│   └── web/           # Frontend Vue 3 + Vite
+├── workers/
+│   ├── aggregator/    # Récupération RSS/Atom
+│   ├── analyzer/      # Classification / résumé / similarité
+│   └── translator/    # Traduction FR ↔ EN ↔ RU
+├── packages/
+│   ├── database/      # Prisma + schéma PostgreSQL
+│   ├── queue/         # BullMQ (helpers Redis)
+│   ├── types/         # Types partagés
+│   ├── config/        # Chargement de la configuration
+│   └── validation/    # Schémas Zod partagés
+├── docs/
+├── docker-compose.yml
+├── .env.example
+└── TODO.md
+```
+
+---
+
+## Cahier des charges
+
+### Table des matières
 
 1. [Objectifs](#1-objectifs)
 2. [Fonctionnement général](#2-fonctionnement-général)

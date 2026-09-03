@@ -1,0 +1,349 @@
+// Schéma Prisma — squelette v0.
+// Les entités sont créées vides ou minimales : la logique métier sera ajoutée au fil des phases.
+// L'URL de connexion est définie dans `prisma.config.ts` (Prisma >= 6).
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+// Enums
+// ============================================================================
+
+enum Language {
+    FR
+    EN
+    RU
+}
+
+enum ArticleStatus {
+    DRAFT
+    IN_REVIEW
+    NEEDS_REVISION
+    APPROVED
+    TRANSLATING
+    PUBLISHED
+    ARCHIVED
+    REJECTED
+}
+
+enum TranslationStatus {
+    PENDING
+    TRANSLATING
+    TRANSLATED
+    REVIEWED
+    PUBLISHED
+}
+
+enum ProposalStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+enum CommentStatus {
+    PUBLISHED
+    HIDDEN
+    DELETED
+    FLAGGED
+}
+
+enum SourceType {
+    RSS
+    ATOM
+    API
+    OTHER
+}
+
+enum SourceStatus {
+    ACTIVE
+    INACTIVE
+}
+
+// ============================================================================
+// Utilisateurs & permissions (RBAC)
+// ============================================================================
+
+model User {
+    id            String   @id @default(cuid())
+    email         String   @unique
+    passwordHash  String
+    displayName   String
+    preferredLang Language @default(FR)
+    isActive      Boolean  @default(true)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    roles              UserRole[]
+    comments           Comment[]
+    editorialActions   EditorialAction[]
+    moderatedProposals ArticleProposal[] @relation("ProposalModerator")
+    authoredArticles   Article[]         @relation("ArticleAuthor")
+}
+
+model Role {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    description String?
+    createdAt   DateTime @default(now())
+
+    users       UserRole[]
+    permissions RolePermission[]
+}
+
+model Permission {
+    id          String  @id @default(cuid())
+    key         String  @unique // ex: "article.publish"
+    description String?
+
+    roles RolePermission[]
+}
+
+model UserRole {
+    userId String
+    roleId String
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@id([userId, roleId])
+}
+
+model RolePermission {
+    roleId       String
+    permissionId String
+
+    role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+    @@id([roleId, permissionId])
+}
+
+// ============================================================================
+// Sources & agrégation
+// ============================================================================
+
+model Source {
+    id               String       @id @default(cuid())
+    name             String
+    url              String       @unique
+    country          String?
+    language         Language
+    type             SourceType
+    aggregationUrl   String?
+    fetchIntervalMin Int          @default(60)
+    status           SourceStatus @default(ACTIVE)
+    lastFetchedAt    DateTime?
+    createdAt        DateTime     @default(now())
+    updatedAt        DateTime     @updatedAt
+
+    items           SourceItem[]
+    aggregationJobs AggregationJob[]
+    articles        Article[]
+}
+
+model SourceItem {
+    id               String    @id @default(cuid())
+    sourceId         String
+    originalUrl      String    @unique
+    originalTitle    String
+    originalContent  String
+    originalLanguage Language
+    publishedAt      DateTime?
+    contentHash      String    @unique
+    rawData          Json?
+    createdAt        DateTime  @default(now())
+
+    source    Source            @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+    proposals ArticleProposal[]
+
+    @@index([sourceId, publishedAt])
+}
+
+model AggregationJob {
+    id         String    @id @default(cuid())
+    sourceId   String
+    startedAt  DateTime  @default(now())
+    finishedAt DateTime?
+    status     String
+    itemsFound Int       @default(0)
+    itemsNew   Int       @default(0)
+    error      String?
+
+    source Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// Propositions d'article (avant modération)
+// ============================================================================
+
+model ArticleProposal {
+    id                String         @id @default(cuid())
+    sourceItemId      String
+    status            ProposalStatus @default(PENDING)
+    suggestedTitle    String?
+    suggestedSummary  String?
+    suggestedCategory String?
+    confidence        Float?
+    reviewedById      String?
+    reviewedAt        DateTime?
+    createdAt         DateTime       @default(now())
+
+    sourceItem SourceItem @relation(fields: [sourceItemId], references: [id], onDelete: Cascade)
+    reviewedBy User?      @relation("ProposalModerator", fields: [reviewedById], references: [id])
+    article    Article?
+
+    @@index([status, createdAt])
+}
+
+// ============================================================================
+// Articles (entité éditoriale, indépendante des langues)
+// ============================================================================
+
+model Article {
+    id           String        @id @default(cuid())
+    slug         String        @unique
+    status       ArticleStatus @default(DRAFT)
+    sourceId     String?
+    proposalId   String?       @unique
+    originalLang Language
+    authorId     String?
+    publishedAt  DateTime?
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+
+    source           Source?              @relation(fields: [sourceId], references: [id])
+    proposal         ArticleProposal?     @relation(fields: [proposalId], references: [id])
+    author           User?                @relation("ArticleAuthor", fields: [authorId], references: [id])
+    translations     ArticleTranslation[]
+    categories       ArticleCategory[]
+    tags             ArticleTag[]
+    comments         Comment[]
+    editorialActions EditorialAction[]
+    translationJobs  TranslationJob[]
+
+    @@index([status, publishedAt])
+}
+
+model ArticleTranslation {
+    id        String            @id @default(cuid())
+    articleId String
+    language  Language
+    title     String
+    summary   String
+    analysis  String
+    status    TranslationStatus @default(PENDING)
+    isMachine Boolean           @default(false)
+    createdAt DateTime          @default(now())
+    updatedAt DateTime          @updatedAt
+
+    article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+    @@unique([articleId, language])
+}
+
+// ============================================================================
+// Catégorisation
+// ============================================================================
+
+model Category {
+    id          String  @id @default(cuid())
+    key         String  @unique
+    labelFr     String
+    labelEn     String
+    labelRu     String
+    description String?
+
+    articles ArticleCategory[]
+}
+
+model Tag {
+    id   String @id @default(cuid())
+    slug String @unique
+    name String
+
+    articles ArticleTag[]
+}
+
+model ArticleCategory {
+    articleId  String
+    categoryId String
+
+    article  Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    @@id([articleId, categoryId])
+}
+
+model ArticleTag {
+    articleId String
+    tagId     String
+
+    article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@id([articleId, tagId])
+}
+
+// ============================================================================
+// Commentaires
+// ============================================================================
+
+model Comment {
+    id        String        @id @default(cuid())
+    articleId String
+    authorId  String
+    parentId  String?
+    content   String
+    status    CommentStatus @default(PUBLISHED)
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+
+    article Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    author  User      @relation(fields: [authorId], references: [id])
+    parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+    replies Comment[] @relation("CommentReplies")
+
+    @@index([articleId, createdAt])
+}
+
+// ============================================================================
+// Historique éditorial (audit trail)
+// ============================================================================
+
+model EditorialAction {
+    id        String   @id @default(cuid())
+    articleId String?
+    userId    String?
+    action    String // ex: "ARTICLE_APPROVED"
+    metadata  Json?
+    createdAt DateTime @default(now())
+
+    article Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+    user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([articleId, createdAt])
+    @@index([action, createdAt])
+}
+
+// ============================================================================
+// Jobs de traduction
+// ============================================================================
+
+model TranslationJob {
+    id         String            @id @default(cuid())
+    articleId  String
+    targetLang Language
+    status     TranslationStatus @default(PENDING)
+    startedAt  DateTime?
+    finishedAt DateTime?
+    error      String?
+    createdAt  DateTime          @default(now())
+
+    article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+    @@unique([articleId, targetLang])
+}
