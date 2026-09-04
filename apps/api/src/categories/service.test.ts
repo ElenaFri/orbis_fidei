@@ -1,4 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { expect, vi } from 'vitest';
+
+import { createFakeCrud } from '../test-utils/fakeCrud.js';
+import { describeCrudService } from '../test-utils/crudServiceSuite.js';
 
 interface FakeCategory {
   id: string;
@@ -6,7 +9,7 @@ interface FakeCategory {
   labelFr: string;
   labelEn: string;
   labelRu: string;
-  description?: string;
+  description?: string | null;
 }
 
 const categories = new Map<string, FakeCategory>();
@@ -14,30 +17,7 @@ let nextId = 1;
 
 vi.mock('@orbis-fidei/database', () => ({
   prisma: {
-    category: {
-      findMany: vi.fn(async () => [...categories.values()]),
-      findUnique: vi.fn(async ({ where }: { where: { id?: string; key?: string } }) => {
-        if (where.id) return categories.get(where.id) ?? null;
-        if (where.key) return [...categories.values()].find((c) => c.key === where.key) ?? null;
-        return null;
-      }),
-      create: vi.fn(async ({ data }: { data: Omit<FakeCategory, 'id'> }) => {
-        const category: FakeCategory = { id: `category_${nextId++}`, ...data };
-        categories.set(category.id, category);
-        return category;
-      }),
-      update: vi.fn(
-        async ({ where, data }: { where: { id: string }; data: Partial<FakeCategory> }) => {
-          const category = categories.get(where.id);
-          if (!category) throw new Error('not found');
-          Object.assign(category, data);
-          return category;
-        },
-      ),
-      delete: vi.fn(async ({ where }: { where: { id: string } }) => {
-        categories.delete(where.id);
-      }),
-    },
+    category: createFakeCrud<FakeCategory>(categories, () => `category_${nextId++}`, 'key'),
   },
 }));
 
@@ -56,49 +36,29 @@ function seedCategory(overrides: Partial<FakeCategory> = {}): FakeCategory {
   return category;
 }
 
-describe('categories service', () => {
-  afterEach(() => categories.clear());
-
-  it('liste les catégories existantes', async () => {
-    seedCategory();
-    await expect(service.listCategories()).resolves.toHaveLength(1);
-  });
-
-  it('crée une catégorie', async () => {
-    const created = await service.createCategory({
-      key: 'theology',
-      labelFr: 'Théologie',
-      labelEn: 'Theology',
-      labelRu: 'Богословие',
-    });
-    expect(created.key).toBe('theology');
-  });
-
-  it('refuse de créer une catégorie avec une clé déjà utilisée', async () => {
-    const existing = seedCategory();
-    await expect(
-      service.createCategory({
-        key: existing.key,
-        labelFr: 'Doublon',
-        labelEn: 'Duplicate',
-        labelRu: 'Дубликат',
-      }),
-    ).rejects.toThrow(service.CategoryError);
-  });
-
-  it('lève une erreur 404 pour une catégorie introuvable', async () => {
-    await expect(service.getCategory('unknown')).rejects.toThrow(service.CategoryError);
-  });
-
-  it('met à jour une catégorie existante', async () => {
-    const category = seedCategory();
-    const updated = await service.updateCategory(category.id, { labelFr: 'Nouveau libellé' });
-    expect(updated.labelFr).toBe('Nouveau libellé');
-  });
-
-  it('supprime une catégorie existante', async () => {
-    const category = seedCategory();
-    await service.deleteCategory(category.id);
-    await expect(service.getCategory(category.id)).rejects.toThrow(service.CategoryError);
-  });
+describeCrudService<FakeCategory>({
+  entityName: 'category',
+  list: service.listCategories,
+  create: (input) => service.createCategory(input as never),
+  get: service.getCategory,
+  update: (id, patch) => service.updateCategory(id, patch as never),
+  remove: service.deleteCategory,
+  ErrorClass: service.CategoryError,
+  seed: seedCategory,
+  resetStore: () => categories.clear(),
+  validCreateInput: {
+    key: 'theology',
+    labelFr: 'Théologie',
+    labelEn: 'Theology',
+    labelRu: 'Богословие',
+  },
+  buildConflictingInput: (existing) => ({
+    key: existing.key,
+    labelFr: 'Duplicate',
+    labelEn: 'Duplicate',
+    labelRu: 'Дубликат',
+  }),
+  updatePatch: { labelFr: 'New label' },
+  assertCreated: (created) => expect(created.key).toBe('theology'),
+  assertUpdated: (updated) => expect(updated.labelFr).toBe('New label'),
 });
