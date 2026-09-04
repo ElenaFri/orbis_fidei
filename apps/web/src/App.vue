@@ -13,12 +13,7 @@ const auth = useAuthStore();
 <template>
   <div class="app">
     <header class="app-header">
-      <RouterLink
-        to="/"
-        class="app-title"
-      >
-        Orbis Fidei
-      </RouterLink>
+      <RouterLink to="/" class="app-title"> Orbis Fidei </RouterLink>
       <nav>
         <RouterLink to="/">
           {{ t('nav.home') }}
@@ -26,10 +21,7 @@ const auth = useAuthStore();
         <RouterLink to="/search">
           {{ t('nav.search') }}
         </RouterLink>
-        <RouterLink
-          v-if="!auth.isAuthenticated"
-          to="/login"
-        >
+        <RouterLink v-if="!auth.isAuthenticated" to="/login">
           {{ t('nav.login') }}
         </RouterLink>
       </nav>

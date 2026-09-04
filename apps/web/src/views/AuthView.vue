@@ -60,10 +60,7 @@ async function onSubmit() {
 
 <template>
   <section class="auth-view">
-    <div
-      class="tabs"
-      role="tablist"
-    >
+    <div class="tabs" role="tablist">
       <button
         type="button"
         role="tab"
@@ -87,23 +84,11 @@ async function onSubmit() {
     <form @submit.prevent="onSubmit">
       <template v-if="mode === 'register'">
         <label for="auth-name">{{ t('auth.displayName') }}</label>
-        <input
-          id="auth-name"
-          v-model="displayName"
-          type="text"
-          autocomplete="name"
-          required
-        >
+        <input id="auth-name" v-model="displayName" type="text" autocomplete="name" required />
       </template>
 
       <label for="auth-email">{{ t('auth.email') }}</label>
-      <input
-        id="auth-email"
-        v-model="email"
-        type="email"
-        autocomplete="email"
-        required
-      >
+      <input id="auth-email" v-model="email" type="email" autocomplete="email" required />
 
       <label for="auth-password">{{ t('auth.password') }}</label>
       <input
@@ -112,19 +97,13 @@ async function onSubmit() {
         type="password"
         :autocomplete="mode === 'login' ? 'current-password' : 'new-password'"
         required
-      >
+      />
 
-      <p
-        v-if="error"
-        class="error"
-      >
+      <p v-if="error" class="error">
         {{ error }}
       </p>
 
-      <button
-        type="submit"
-        :disabled="isSubmitting"
-      >
+      <button type="submit" :disabled="isSubmitting">
         {{ mode === 'login' ? t('auth.submitLogin') : t('auth.submitRegister') }}
       </button>
     </form>

@@ -1,4 +1,6 @@
 import js from '@eslint/js';
+import skipVueFormatting from '@vue/eslint-config-prettier/skip-formatting';
+import eslintConfigPrettier from 'eslint-config-prettier';
 import vue from 'eslint-plugin-vue';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -61,6 +63,10 @@ export default tseslint.config(
             'vue/multi-word-component-names': 'off',
         },
     },
+    // Désactive les règles stylistiques (vue/*, core, typescript-eslint) qui entrent en
+    // conflit avec Prettier — doit rester en dernier pour prévaloir sur les configs ci-dessus.
+    skipVueFormatting,
+    eslintConfigPrettier,
 
     {
         files: ['**/*.test.ts', '**/*.spec.ts'],

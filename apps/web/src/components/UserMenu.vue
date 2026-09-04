@@ -45,10 +45,7 @@ async function onLogout() {
 </script>
 
 <template>
-  <div
-    ref="rootEl"
-    class="user-menu"
-  >
+  <div ref="rootEl" class="user-menu">
     <button
       type="button"
       class="avatar"
@@ -59,20 +56,11 @@ async function onLogout() {
       {{ initials }}
     </button>
 
-    <div
-      v-if="isOpen"
-      class="dropdown"
-      role="menu"
-    >
+    <div v-if="isOpen" class="dropdown" role="menu">
       <p class="dropdown-name">
         {{ auth.user?.displayName }}
       </p>
-      <button
-        type="button"
-        class="dropdown-action"
-        role="menuitem"
-        @click="onLogout"
-      >
+      <button type="button" class="dropdown-action" role="menuitem" @click="onLogout">
         {{ t('nav.logout') }}
       </button>
     </div>
