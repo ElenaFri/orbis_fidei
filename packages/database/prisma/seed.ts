@@ -1,3 +1,4 @@
+import { hash } from '@node-rs/argon2';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -34,6 +35,8 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 };
 
 async function main() {
+  const roles = new Map<string, { id: string }>();
+
   for (const permission of DEFAULT_PERMISSIONS) {
     await prisma.permission.upsert({
       where: { key: permission.key },
@@ -62,6 +65,8 @@ async function main() {
         create: { roleId: role.id, permissionId: permission.id },
       });
     }
+
+    roles.set(roleName, role);
   }
 
   const defaultCategories = [
@@ -97,7 +102,37 @@ async function main() {
     });
   }
 
-  console.log('✓ Seed terminé (permissions, rôles, catégories par défaut)');
+  // Utilisateur admin de dev — ne pas utiliser en production.
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@orbisfidei.local';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe123!';
+  const adminPasswordHash = await hash(adminPassword, {
+    algorithm: 2, // Argon2id
+    memoryCost: 19456,
+    timeCost: 2,
+    parallelism: 1,
+  });
+
+  const adminUser = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      passwordHash: adminPasswordHash,
+      displayName: 'Administrateur',
+      preferredLang: 'FR',
+    },
+  });
+
+  const adminRole = roles.get('ADMIN');
+  if (adminRole) {
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: adminUser.id, roleId: adminRole.id } },
+      update: {},
+      create: { userId: adminUser.id, roleId: adminRole.id },
+    });
+  }
+
+  console.log(`✓ Seed terminé (permissions, rôles, catégories, admin: ${adminEmail})`);
 }
 
 try {

@@ -67,7 +67,7 @@ Objectif : schéma initial, migrations, client Prisma partagé.
   - [x] `EditorialAction` (audit trail)
   - [x] `AggregationJob`, `TranslationJob`
 - [x] Enums : `Language`, `ArticleStatus`, `TranslationStatus`, `CommentStatus`, `ProposalStatus`, `SourceType`, `SourceStatus`
-- [ ] Première migration `init` (à générer après `pnpm install`)
+- [x] Première migration `init` (à générer après `pnpm install`)
 - [~] Seeds : permissions + rôles + catégories par défaut faits ; admin de dev à ajouter
 - [x] Scripts npm : `db:migrate`, `db:reset`, `db:seed`, `db:studio`
 
@@ -84,16 +84,18 @@ Objectif : API Fastify qui démarre, expose `/health`, structure par domaine.
 - [x] Middleware : CORS, helmet, rate-limit, body-parser JSON (natif Fastify)
 - [x] Endpoint `GET /health` → `{ status: "ok", db: bool, redis: bool }`
 - [x] Chargement de la configuration via Zod (fail-fast si invalide)
-- [~] Structure `src/<domaine>/` : `health/` créé ; reste : `auth/`, `users/`, `roles/`, `articles/`, `translations/`, `sources/`, `comments/`, `moderation/`, `categories/`, `jobs/`
-- [ ] Convention par domaine : `routes.ts`, `service.ts`, `schemas.ts`, `*.test.ts`
+- [~] Structure `src/<domaine>/` : `health/`, `auth/` créés ; reste : `users/`, `roles/`, `articles/`, `translations/`, `sources/`, `comments/`, `moderation/`, `categories/`, `jobs/`
+- [x] Convention par domaine : `routes.ts`, `service.ts`, `schemas.ts` (via `@orbis-fidei/validation`), `*.test.ts` (appliquée sur `auth/`)
 
 ### 2.2 Auth & RBAC
 
-- [ ] Endpoints `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`
-- [ ] Hash Argon2id des mots de passe
-- [ ] JWT signés + refresh token en cookie httpOnly SameSite=Lax
-- [ ] Décorateur / hook Fastify `requirePermission("article.publish")`
-- [ ] Endpoint `GET /me`
+- [x] Endpoints `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`
+- [x] Hash Argon2id des mots de passe (`@node-rs/argon2`)
+- [x] JWT signés (access + refresh) + refresh token en cookie httpOnly SameSite=Lax
+- [x] Décorateur / hook Fastify `requirePermission("article.publish")` (+ `requireAuth`)
+- [x] Endpoint `GET /me`
+- [x] Révocation globale des refresh tokens via `tokenVersion` (migration `add_user_token_version`)
+- [x] Seed : utilisateur admin de dev (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 
 ### 2.3 Domaines métier (CRUD minimaux)
 
@@ -256,8 +258,8 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 ## Jalons
 
 - **M0 — Site vierge qui démarre** ✅ _code en place_ — reste à exécuter en local : `pnpm install`, `pnpm docker:up`, `pnpm db:migrate`, `pnpm dev`.
-- **M1 — Authentification & RBAC** _(prochaine cible)_ : login/logout, rôles, garde routes admin.
-- **M2 — Backoffice minimal** : gestion des sources, des catégories, création manuelle d'article.
+- **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin. Reste côté frontend : garde de route + pages login/register (Phase 3.2/3.3).
+- **M2 — Backoffice minimal** _(prochaine cible)_ : gestion des sources, des catégories, création manuelle d'article.
 - **M3 — Interface publique** : liste d'articles + article détaillé + commentaires + i18n.
 - **M4 — Agrégation RSS** : worker aggregator + propositions dans le back-office.
 - **M5 — IA (résumé + classification + doublons)** : worker analyzer.
