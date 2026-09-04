@@ -7,7 +7,7 @@ export default {
   },
   home: {
     title: 'Orbis Fidei',
-    tagline: "L'actualité religieuse dans le monde",
+    tagline: 'Chrétienté et spiritualité dans le monde',
     empty: "Aucun article publié pour l'instant. Le portail se met en place.",
   },
   search: {

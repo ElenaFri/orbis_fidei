@@ -1,6 +1,6 @@
 # Orbis Fidei
 
-> **L'actualité religieuse dans le monde**
+> **Chrétienté et spiritualité dans le monde**
 
 [![CI](https://github.com/ElenaFri/orbis_fidei/actions/workflows/ci.yml/badge.svg)](https://github.com/ElenaFri/orbis_fidei/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/ElenaFri/orbis_fidei/graph/badge.svg?token=7LQOKQAesk)](https://codecov.io/gh/ElenaFri/orbis_fidei)
@@ -108,7 +108,7 @@ orbis-fidei/
 
 Orbis Fidei a pour objectifs de :
 
-- centraliser l'actualité religieuse internationale ;
+- centraliser l'actualité chrétienne et spirituelle internationale ;
 - agréger automatiquement des informations provenant de médias chrétiens ;
 - détecter les contenus similaires et les doublons ;
 - proposer les informations pertinentes aux modérateurs ;

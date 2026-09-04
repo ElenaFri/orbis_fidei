@@ -7,7 +7,7 @@ export default {
   },
   home: {
     title: 'Orbis Fidei',
-    tagline: 'Religious news around the world',
+    tagline: 'Christianity and spirituality around the world',
     empty: 'No articles published yet. The portal is being set up.',
   },
   search: {
