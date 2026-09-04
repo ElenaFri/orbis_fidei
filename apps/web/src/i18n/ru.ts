@@ -2,6 +2,8 @@ export default {
   nav: {
     home: 'Главная',
     search: 'Поиск',
+    login: 'Вход',
+    logout: 'Выйти',
   },
   home: {
     title: 'Orbis Fidei',
@@ -17,5 +19,15 @@ export default {
     title: 'Страница не найдена',
     message: 'Запрошенная страница не существует.',
     back: 'На главную',
+  },
+  auth: {
+    loginTitle: 'Вход',
+    registerTitle: 'Создать аккаунт',
+    email: 'Email',
+    password: 'Пароль',
+    displayName: 'Имя',
+    submitLogin: 'Войти',
+    submitRegister: 'Зарегистрироваться',
+    error: 'Произошла ошибка.',
   },
 };

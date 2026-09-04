@@ -1,0 +1,70 @@
+/* Styles partagés pour les formulaires d'authentification (login/register). */
+.auth-view {
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+.auth-view .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    margin-bottom: 1.5rem;
+}
+
+.auth-view .tabs button {
+    flex: 1;
+    background: none;
+    border: none;
+    margin-top: 0;
+    padding: 0.75rem 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-muted, #6b7280);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.auth-view .tabs button.active {
+    color: var(--color-accent, #1e40af);
+    border-bottom-color: var(--color-accent, #1e40af);
+}
+
+.auth-view form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.auth-view label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.auth-view input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.auth-view button {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background: var(--color-accent, #1e40af);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.auth-view button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.auth-view .error {
+    color: #b91c1c;
+    font-size: 0.875rem;
+}

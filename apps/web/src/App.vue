@@ -3,18 +3,37 @@ import { useI18n } from 'vue-i18n';
 import { RouterLink, RouterView } from 'vue-router';
 
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+import UserMenu from '@/components/UserMenu.vue';
+import { useAuthStore } from '@/stores/auth';
 
 const { t } = useI18n();
+const auth = useAuthStore();
 </script>
 
 <template>
   <div class="app">
     <header class="app-header">
-      <RouterLink to="/" class="app-title">Orbis Fidei</RouterLink>
+      <RouterLink
+        to="/"
+        class="app-title"
+      >
+        Orbis Fidei
+      </RouterLink>
       <nav>
-        <RouterLink to="/">{{ t('nav.home') }}</RouterLink>
-        <RouterLink to="/search">{{ t('nav.search') }}</RouterLink>
+        <RouterLink to="/">
+          {{ t('nav.home') }}
+        </RouterLink>
+        <RouterLink to="/search">
+          {{ t('nav.search') }}
+        </RouterLink>
+        <RouterLink
+          v-if="!auth.isAuthenticated"
+          to="/login"
+        >
+          {{ t('nav.login') }}
+        </RouterLink>
       </nav>
+      <UserMenu v-if="auth.isAuthenticated" />
       <LanguageSwitcher />
     </header>
 
@@ -46,8 +65,26 @@ const { t } = useI18n();
 
 .app-header nav {
   display: flex;
+  align-items: center;
   gap: 1rem;
   margin-right: auto;
+}
+
+.app-header nav a {
+  color: var(--color-muted, #6b7280);
+  text-decoration: none;
+  padding-bottom: 2px;
+}
+
+.app-header nav a:hover {
+  color: var(--color-text, #111827);
+}
+
+/* Onglet courant mis en évidence — sera revu avec la charte graphique définitive. */
+.app-header nav a.router-link-exact-active {
+  color: var(--color-accent, #1e40af);
+  font-weight: 700;
+  border-bottom: 2px solid var(--color-accent, #1e40af);
 }
 
 .app-main {

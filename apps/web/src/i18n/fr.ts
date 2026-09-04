@@ -2,6 +2,8 @@ export default {
   nav: {
     home: 'Accueil',
     search: 'Recherche',
+    login: 'Connexion',
+    logout: 'Déconnexion',
   },
   home: {
     title: 'Orbis Fidei',
@@ -17,5 +19,15 @@ export default {
     title: 'Page introuvable',
     message: "La page demandée n'existe pas.",
     back: "Retour à l'accueil",
+  },
+  auth: {
+    loginTitle: 'Connexion',
+    registerTitle: 'Créer un compte',
+    email: 'Email',
+    password: 'Mot de passe',
+    displayName: 'Nom affiché',
+    submitLogin: 'Se connecter',
+    submitRegister: "S'inscrire",
+    error: 'Une erreur est survenue.',
   },
 };

@@ -258,7 +258,7 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 ## Jalons
 
 - **M0 — Site vierge qui démarre** ✅ _code en place_ — reste à exécuter en local : `pnpm install`, `pnpm docker:up`, `pnpm db:migrate`, `pnpm dev`.
-- **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin. Reste côté frontend : garde de route + pages login/register (Phase 3.2/3.3).
+- **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin, formulaires d'inscription/connexion.
 - **M2 — Backoffice minimal** _(prochaine cible)_ : gestion des sources, des catégories, création manuelle d'article.
 - **M3 — Interface publique** : liste d'articles + article détaillé + commentaires + i18n.
 - **M4 — Agrégation RSS** : worker aggregator + propositions dans le back-office.
