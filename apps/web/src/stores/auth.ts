@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /** Tente de restaurer la session via le cookie de refresh (appelé au démarrage de l'app). */
+  /** Attempts to restore the session via the refresh cookie (called on app startup). */
   async function init(): Promise<void> {
     try {
       const refreshed = await api.refresh();

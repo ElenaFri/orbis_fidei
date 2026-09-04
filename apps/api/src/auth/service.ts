@@ -151,7 +151,7 @@ export async function refresh(refreshToken: string): Promise<AuthResult> {
   };
 }
 
-/** Révoque tous les refresh tokens émis pour cet utilisateur (logout global). */
+/** Revokes all refresh tokens issued for this user (global logout). */
 export async function revokeAllSessions(userId: string): Promise<void> {
   await prisma.user.update({
     where: { id: userId },

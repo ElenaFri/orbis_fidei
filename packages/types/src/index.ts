@@ -26,3 +26,55 @@ export interface AuthenticatedUser {
   preferredLang: Language;
   permissions: string[];
 }
+
+export type SourceType = 'RSS' | 'ATOM' | 'API' | 'OTHER';
+export type SourceStatus = 'ACTIVE' | 'INACTIVE';
+
+export interface AdminSource {
+  id: string;
+  name: string;
+  url: string;
+  country: string | null;
+  language: Language;
+  type: SourceType;
+  aggregationUrl: string | null;
+  fetchIntervalMin: number;
+  status: SourceStatus;
+  lastFetchedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminCategory {
+  id: string;
+  key: string;
+  labelFr: string;
+  labelEn: string;
+  labelRu: string;
+  description: string | null;
+}
+
+export interface AdminArticleTranslation {
+  id: string;
+  articleId: string;
+  language: Language;
+  title: string;
+  summary: string;
+  analysis: string;
+  status: string;
+  isMachine: boolean;
+}
+
+export interface AdminArticle {
+  id: string;
+  slug: string;
+  status: string;
+  sourceId: string | null;
+  originalLang: Language;
+  authorId: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  translations: AdminArticleTranslation[];
+  categories: { articleId: string; categoryId: string }[];
+}

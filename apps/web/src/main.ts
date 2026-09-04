@@ -7,6 +7,7 @@ import { router } from './router';
 import { useAuthStore } from './stores/auth';
 import './styles/main.css';
 import './styles/auth.css';
+import './styles/admin.css';
 
 const app = createApp(App);
 const pinia = createPinia();

@@ -14,7 +14,7 @@ function setRefreshCookie(reply: FastifyReply, token: string): void {
     secure: config.NODE_ENV === 'production',
     sameSite: 'lax',
     path: REFRESH_COOKIE_PATH,
-    maxAge: 60 * 60 * 24 * 7, // 7 jours, cohérent avec JWT_REFRESH_TTL par défaut
+    maxAge: 60 * 60 * 24 * 7, // 7 days, consistent with the default JWT_REFRESH_TTL
   });
 }
 

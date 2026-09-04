@@ -14,29 +14,41 @@ export default defineConfig({
         '**/generated/**',
         '**/*.config.*',
         '**/vitest.workspace.ts',
-        // Points d'entrée : glue de bootstrap, peu de logique propre, pas de valeur à tester unitairement.
+        // Entry points: bootstrap glue, little own logic, no value in unit testing them.
         '**/src/main.ts',
-        // Script imprératif à usage unique (seed de dev), pas une logique applicative.
+        // One-off imperative script (dev seed), not application logic.
         'packages/database/prisma/seed.ts',
-        // Export trivial du client Prisma singleton, aucune logique.
+        // Trivial export of the Prisma client singleton, no logic.
         'packages/database/src/index.ts',
-        // Composants/vues présentationnels : l'apparence sera entièrement revue plus tard.
+        // Presentational components/views: the look and feel will be entirely redesigned later.
         'apps/web/src/views/**',
         'apps/web/src/components/**',
         'apps/web/src/App.vue',
-        // Table de routes déclarative + données de traduction statiques : pas de logique à couvrir.
-        'apps/web/src/router/**',
+        // Declarative route table (components + meta): no logic to cover.
+        // Guard logic lives in router/guards.ts and is well covered by tests.
+        'apps/web/src/router/index.ts',
         'apps/web/src/i18n/**',
-        // Workers pas encore implémentés : stubs sans logique.
+        // Workers not implemented yet: stubs with no logic.
         'workers/**/src/main.ts',
+        // Shared test utilities (test helpers), not application logic.
+        '**/test-utils/**',
       ],
-      // Seuils appliqués uniquement au périmètre des jalons livrés.
-      // Chaque nouveau jalon doit ajouter ses propres seuils ici en plus des seuils existants.
+      // Thresholds applied only to the scope of delivered milestones.
+      // Each new milestone should add its own thresholds here in addition to the existing ones.
       thresholds: {
         'apps/api/src/auth/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/api/src/health/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
+        'apps/api/src/sources/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
+        'apps/api/src/categories/**/*.ts': {
+          statements: 90,
+          branches: 80,
+          functions: 90,
+          lines: 90,
+        },
+        'apps/api/src/articles/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/services/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/stores/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
+        'apps/web/src/router/guards.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
       },
     },
   },

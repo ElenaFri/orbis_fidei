@@ -99,15 +99,15 @@ Objectif : API Fastify qui démarre, expose `/health`, structure par domaine.
 
 ### 2.3 Domaines métier (CRUD minimaux)
 
-- [ ] Sources : CRUD admin
-- [ ] Catégories / tags : CRUD admin
-- [ ] Articles (lecture publique + admin) :
-  - [ ] `GET /articles?lang=fr&page=…` liste publique paginée
-  - [ ] `GET /articles/:slug` détail public (langue courante)
-  - [ ] `GET /admin/articles` liste admin (tous statuts)
-  - [ ] `POST /admin/articles` création manuelle
-  - [ ] `PATCH /admin/articles/:id` édition
-  - [ ] `POST /admin/articles/:id/publish` transition d'état
+- [x] Sources : CRUD admin
+- [x] Catégories : CRUD admin (tags reportés — non requis par M2)
+- [~] Articles (lecture publique + admin) :
+  - [ ] `GET /articles?lang=fr&page=…` liste publique paginée (M3)
+  - [ ] `GET /articles/:slug` détail public (langue courante) (M3)
+  - [x] `GET /admin/articles` liste admin (tous statuts)
+  - [x] `POST /admin/articles` création manuelle (avec traductions imbriquées)
+  - [x] `PATCH /admin/articles/:id` édition (traductions + catégories)
+  - [ ] `POST /admin/articles/:id/publish` transition d'état (hors scope M2, prévu avec le workflow éditorial)
 - [ ] Propositions : `GET /admin/proposals`, `POST /admin/proposals/:id/accept|reject`
 - [ ] Commentaires : `GET /articles/:id/comments`, `POST /articles/:id/comments`, `POST /comments/:id/report`
 - [ ] Modération commentaires : `PATCH /admin/comments/:id` (`hide`, `delete`)
@@ -145,13 +145,14 @@ Objectif : SPA Vue qui démarre, deux espaces (public + admin), i18n FR/EN/RU.
 
 ### 3.3 Espace admin (routes protégées)
 
-- [ ] Garde de route : redirection si non authentifié / non autorisé
-- [ ] Layout admin (sidebar filtrée par permissions)
+- [x] Garde de route : redirection si non authentifié / non autorisé (`router/guards.ts`)
+- [x] Layout admin (sidebar filtrée par permissions)
 - [ ] `/admin/suggestions` : file des propositions
-- [ ] `/admin/articles` : liste + édition
+- [x] `/admin/articles` : liste + création (édition multi-langue à approfondir)
 - [ ] `/admin/translations` : traductions à relire
 - [ ] `/admin/comments` : modération
-- [ ] `/admin/sources` : CRUD sources
+- [x] `/admin/sources` : CRUD sources
+- [x] `/admin/categories` : CRUD catégories
 - [ ] `/admin/users` : gestion utilisateurs / rôles
 
 ### 3.4 Commentaires
@@ -259,8 +260,8 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 - **M0 — Site vierge qui démarre** ✅ _code en place_ — reste à exécuter en local : `pnpm install`, `pnpm docker:up`, `pnpm db:migrate`, `pnpm dev`.
 - **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin, formulaires d'inscription/connexion.
-- **M2 — Backoffice minimal** _(prochaine cible)_ : gestion des sources, des catégories, création manuelle d'article.
-- **M3 — Interface publique** : liste d'articles + article détaillé + commentaires + i18n.
+- **M2 — Backoffice minimal** ✅ : CRUD sources/catégories, création manuelle d'article (API + backoffice `/admin`).
+- **M3 — Interface publique** _(prochaine cible)_ : liste d'articles + article détaillé + commentaires + i18n.
 - **M4 — Agrégation RSS** : worker aggregator + propositions dans le back-office.
 - **M5 — IA (résumé + classification + doublons)** : worker analyzer.
 - **M6 — Traduction automatique** : worker translator + relecture.

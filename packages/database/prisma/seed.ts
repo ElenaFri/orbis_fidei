@@ -102,7 +102,7 @@ async function main() {
     });
   }
 
-  // Utilisateur admin de dev — ne pas utiliser en production.
+  // Dev admin user — do not use in production.
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@orbisfidei.local';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe123!';
   const adminPasswordHash = await hash(adminPassword, {

@@ -20,7 +20,7 @@ const worker = createWorker(
   QUEUES.ANALYSIS,
   async (job) => {
     logger.info({ jobId: job.id, name: job.name }, 'analysis job received (stub)');
-    // Implémenté ultérieurement : détection langue, catégorie, similarité, résumé, création ArticleProposal.
+    // Implemented later: language detection, category, similarity, summary, ArticleProposal creation.
     return { ok: true };
   },
   connection,

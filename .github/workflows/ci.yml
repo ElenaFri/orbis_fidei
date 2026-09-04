@@ -19,7 +19,7 @@ jobs:
     name: Lint · Typecheck · Format
     runs-on: ubuntu-latest
     env:
-      # Prisma exige que DATABASE_URL soit définie pour `validate`/`format`
+      # Prisma requires DATABASE_URL to be set for `validate`/`format`
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2

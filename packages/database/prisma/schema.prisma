@@ -1,5 +1,5 @@
-// Schéma Prisma — squelette v0.
-// Les entités sont créées vides ou minimales : la logique métier sera ajoutée au fil des phases.
+// Prisma schema — v0 skeleton.
+// Entities are created empty or minimal: business logic will be added as phases progress.
 
 generator client {
   provider = "prisma-client-js"
@@ -64,7 +64,7 @@ enum SourceStatus {
 }
 
 // ============================================================================
-// Utilisateurs & permissions (RBAC)
+// Users & permissions (RBAC)
 // ============================================================================
 
 model User {
@@ -74,7 +74,7 @@ model User {
   displayName   String
   preferredLang Language @default(FR)
   isActive      Boolean  @default(true)
-  tokenVersion  Int      @default(0) // incrémenté pour révoquer tous les refresh tokens émis
+  tokenVersion  Int      @default(0) // incremented to revoke all issued refresh tokens
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -124,7 +124,7 @@ model RolePermission {
 }
 
 // ============================================================================
-// Sources & agrégation
+// Sources & aggregation
 // ============================================================================
 
 model Source {
@@ -178,7 +178,7 @@ model AggregationJob {
 }
 
 // ============================================================================
-// Propositions d'article (avant modération)
+// Article proposals (before moderation)
 // ============================================================================
 
 model ArticleProposal {
@@ -201,7 +201,7 @@ model ArticleProposal {
 }
 
 // ============================================================================
-// Articles (entité éditoriale, indépendante des langues)
+// Articles (editorial entity, language-independent)
 // ============================================================================
 
 model Article {
@@ -247,7 +247,7 @@ model ArticleTranslation {
 }
 
 // ============================================================================
-// Catégorisation
+// Categorization
 // ============================================================================
 
 model Category {
@@ -290,7 +290,7 @@ model ArticleTag {
 }
 
 // ============================================================================
-// Commentaires
+// Comments
 // ============================================================================
 
 model Comment {
@@ -312,7 +312,7 @@ model Comment {
 }
 
 // ============================================================================
-// Historique éditorial (audit trail)
+// Editorial history (audit trail)
 // ============================================================================
 
 model EditorialAction {
@@ -331,7 +331,7 @@ model EditorialAction {
 }
 
 // ============================================================================
-// Jobs de traduction
+// Translation jobs
 // ============================================================================
 
 model TranslationJob {

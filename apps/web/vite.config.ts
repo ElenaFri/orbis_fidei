@@ -10,7 +10,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  // es2022 supporte le top-level await (utilisé dans main.ts) ; cible navigateurs modernes.
+  // es2022 supports top-level await (used in main.ts); targets modern browsers.
   build: {
     target: 'es2022',
   },

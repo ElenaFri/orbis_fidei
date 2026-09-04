@@ -48,11 +48,11 @@ describe('api client', () => {
   it('rafraîchit silencieusement puis rejoue la requête après un 401', async () => {
     const fetchMock = vi
       .fn()
-      // 1) requête initiale -> 401
+      // 1) initial request -> 401
       .mockResolvedValueOnce(jsonResponse({ error: 'Expiré.' }, { status: 401 }))
-      // 2) /auth/refresh -> succès
+      // 2) /auth/refresh -> success
       .mockResolvedValueOnce(jsonResponse({ accessToken: 'new-token', user: { id: '1' } }))
-      // 3) requête rejouée -> succès
+      // 3) replayed request -> success
       .mockResolvedValueOnce(jsonResponse({ id: '1', email: 'a@b.com' }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -101,5 +101,150 @@ describe('api client', () => {
   it('refresh() renvoie false sans lever si le réseau échoue', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
     await expect(api.refresh()).resolves.toBe(false);
+  });
+
+  it('sources.list() interroge le bon endpoint', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([{ id: 's1' }]));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await api.sources.list();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/sources'),
+      expect.anything(),
+    );
+    expect(result).toEqual([{ id: 's1' }]);
+  });
+
+  it('sources.create() envoie un POST avec le corps attendu', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 's1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.sources.create({
+      name: 'KTO',
+      url: 'https://kto.com/rss',
+      language: 'FR',
+      type: 'RSS',
+      fetchIntervalMin: 60,
+      status: 'ACTIVE',
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/sources'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('sources.remove() envoie un DELETE', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.sources.remove('s1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/sources/s1'),
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
+  it('sources.update() envoie un PATCH', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 's1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.sources.update('s1', { name: 'Nouveau nom' });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/sources/s1'),
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+  });
+
+  it('categories.create() envoie un POST avec le corps attendu', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'c1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.categories.create({
+      key: 'theology',
+      labelFr: 'Théologie',
+      labelEn: 'Theology',
+      labelRu: 'Богословие',
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/categories'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('categories.update() envoie un PATCH', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'c1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.categories.update('c1', { labelFr: 'Nouveau libellé' });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/categories/c1'),
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+  });
+
+  it('categories.remove() envoie un DELETE', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.categories.remove('c1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/categories/c1'),
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
+  it('articles.create() envoie un POST avec le corps attendu', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'a1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.articles.create({
+      slug: 'mon-article',
+      originalLang: 'FR',
+      categoryIds: [],
+      translations: [
+        {
+          language: 'FR',
+          title: 'Titre suffisant',
+          summary: 'Résumé suffisant.',
+          analysis: 'Analyse suffisante.',
+        },
+      ],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/articles'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('articles.get() interroge le bon endpoint', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'a1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.articles.get('a1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/articles/a1'),
+      expect.anything(),
+    );
+  });
+
+  it('articles.update() envoie un PATCH', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'a1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.articles.update('a1', { categoryIds: ['cat_1'] });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/articles/a1'),
+      expect.objectContaining({ method: 'PATCH' }),
+    );
   });
 });

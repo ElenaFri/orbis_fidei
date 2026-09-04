@@ -43,14 +43,14 @@ const authPlugin: FastifyPluginAsync = async (app) => {
 
 export default fp(authPlugin, { name: 'auth' });
 
-/** Rejette la requête si l'utilisateur n'est pas authentifié. */
+/** Rejects the request with 401 if there is no authenticated user. */
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   if (!request.currentUser) {
     await reply.code(401).send({ error: 'Authentification requise.' });
   }
 }
 
-/** Rejette la requête si l'utilisateur n'est pas authentifié ou ne possède pas la permission donnée. */
+/** Rejects the request if the user is not authenticated or lacks the required permission. */
 export function requirePermission(permissionKey: string) {
   return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const user = request.currentUser;

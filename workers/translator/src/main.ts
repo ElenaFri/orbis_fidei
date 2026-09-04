@@ -20,7 +20,7 @@ const worker = createWorker(
   QUEUES.TRANSLATION,
   async (job) => {
     logger.info({ jobId: job.id, name: job.name }, 'translation job received (stub)');
-    // Implémenté ultérieurement : traduction title/summary/analysis via provider IA vers la langue cible.
+    // Implemented later: title/summary/analysis translation via an AI provider into the target language.
     return { ok: true };
   },
   connection,

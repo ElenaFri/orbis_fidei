@@ -1,6 +1,6 @@
 import { hash, verify } from '@node-rs/argon2';
 
-// Paramètres OWASP recommandés pour Argon2id (m=19MiB, t=2, p=1) — voir cheat sheet OWASP.
+// OWASP-recommended Argon2id parameters (m=19MiB, t=2, p=1) — see OWASP cheat sheet.
 const ARGON2_OPTIONS = {
   algorithm: 2, // Argon2id
   memoryCost: 19456,

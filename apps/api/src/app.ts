@@ -7,8 +7,11 @@ import Fastify, { type FastifyInstance } from 'fastify';
 
 import authPlugin from './auth/plugin.js';
 import { registerAuthRoutes } from './auth/routes.js';
+import { registerArticleRoutes } from './articles/routes.js';
+import { registerCategoryRoutes } from './categories/routes.js';
 import { config } from './config.js';
 import { registerHealthRoutes } from './health/routes.js';
+import { registerSourceRoutes } from './sources/routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const loggerOptions =
@@ -33,6 +36,9 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(registerHealthRoutes);
   await app.register(registerAuthRoutes);
+  await app.register(registerSourceRoutes);
+  await app.register(registerCategoryRoutes);
+  await app.register(registerArticleRoutes);
 
   return app;
 }

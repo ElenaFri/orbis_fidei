@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink, RouterView } from 'vue-router';
 
@@ -8,6 +9,13 @@ import { useAuthStore } from '@/stores/auth';
 
 const { t } = useI18n();
 const auth = useAuthStore();
+
+const canAccessAdmin = computed(
+  () =>
+    auth.hasPermission('source.manage') ||
+    auth.hasPermission('category.manage') ||
+    auth.hasPermission('article.create'),
+);
 </script>
 
 <template>
@@ -20,6 +28,9 @@ const auth = useAuthStore();
         </RouterLink>
         <RouterLink to="/search">
           {{ t('nav.search') }}
+        </RouterLink>
+        <RouterLink v-if="canAccessAdmin" to="/admin">
+          {{ t('nav.admin') }}
         </RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/login">
           {{ t('nav.login') }}
@@ -72,7 +83,7 @@ const auth = useAuthStore();
   color: var(--color-text, #111827);
 }
 
-/* Onglet courant mis en évidence — sera revu avec la charte graphique définitive. */
+/* Active tab highlighted — will be revisited with the final visual design. */
 .app-header nav a.router-link-exact-active {
   color: var(--color-accent, #1e40af);
   font-weight: 700;

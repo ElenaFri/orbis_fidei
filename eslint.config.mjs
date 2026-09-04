@@ -63,8 +63,8 @@ export default tseslint.config(
             'vue/multi-word-component-names': 'off',
         },
     },
-    // Désactive les règles stylistiques (vue/*, core, typescript-eslint) qui entrent en
-    // conflit avec Prettier — doit rester en dernier pour prévaloir sur les configs ci-dessus.
+    // Disables stylistic rules (vue/*, core, typescript-eslint) that conflict with
+    // Prettier — must stay last to take precedence over the configs above.
     skipVueFormatting,
     eslintConfigPrettier,
 

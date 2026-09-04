@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { config as loadDotenv } from 'dotenv';
 import { z } from 'zod';
 
-// Remonte l'arborescence depuis `startDir` jusqu'à trouver un `.env` (typiquement à la racine du monorepo).
+// Walks up the directory tree from `startDir` until it finds a `.env` (typically at the monorepo root).
 export function loadRootEnv(startDir: string, filename = '.env'): string | null {
   let current = startDir;
   while (true) {

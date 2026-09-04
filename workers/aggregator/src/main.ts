@@ -20,7 +20,7 @@ const worker = createWorker(
   QUEUES.AGGREGATION,
   async (job) => {
     logger.info({ jobId: job.id, name: job.name }, 'aggregation job received (stub)');
-    // Implémenté dans une phase ultérieure : fetch RSS/Atom, déduplication, création SourceItem.
+    // Implemented in a later phase: fetch RSS/Atom, deduplication, SourceItem creation.
     return { ok: true };
   },
   connection,

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { LoginSchema, RegisterSchema, CommentInputSchema } from './index.js';
+import {
+  LoginSchema,
+  RegisterSchema,
+  CommentInputSchema,
+  SourceInputSchema,
+  CategoryInputSchema,
+  ArticleCreateInputSchema,
+} from './index.js';
 
 describe('LoginSchema', () => {
   it('accepte des identifiants valides', () => {
@@ -45,5 +52,99 @@ describe('CommentInputSchema', () => {
   it('accepte un commentaire simple', () => {
     const result = CommentInputSchema.safeParse({ content: 'Bel article.' });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('SourceInputSchema', () => {
+  it('applique les valeurs par défaut (fetchIntervalMin, status)', () => {
+    const result = SourceInputSchema.safeParse({
+      name: 'Radio Notre-Dame',
+      url: 'https://radionotredame.net',
+      language: 'FR',
+      type: 'RSS',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.fetchIntervalMin).toBe(60);
+      expect(result.data.status).toBe('ACTIVE');
+    }
+  });
+
+  it('refuse une URL invalide', () => {
+    const result = SourceInputSchema.safeParse({
+      name: 'Radio Notre-Dame',
+      url: 'not-a-url',
+      language: 'FR',
+      type: 'RSS',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('CategoryInputSchema', () => {
+  it('accepte une clé en minuscules avec tirets', () => {
+    const result = CategoryInputSchema.safeParse({
+      key: 'church-news',
+      labelFr: 'Actualité des Églises',
+      labelEn: 'Church news',
+      labelRu: 'Церковные новости',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('refuse une clé avec des majuscules ou des espaces', () => {
+    const result = CategoryInputSchema.safeParse({
+      key: 'Church News',
+      labelFr: 'Actualité des Églises',
+      labelEn: 'Church news',
+      labelRu: 'Церковные новости',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('ArticleCreateInputSchema', () => {
+  it('accepte un article avec au moins une traduction', () => {
+    const result = ArticleCreateInputSchema.safeParse({
+      slug: 'le-patriarche-rencontre',
+      originalLang: 'FR',
+      translations: [
+        {
+          language: 'FR',
+          title: 'Titre suffisant',
+          summary: 'Résumé suffisamment long.',
+          analysis: 'Analyse suffisamment longue.',
+        },
+      ],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.categoryIds).toEqual([]);
+    }
+  });
+
+  it('refuse un article sans aucune traduction', () => {
+    const result = ArticleCreateInputSchema.safeParse({
+      slug: 'le-patriarche-rencontre',
+      originalLang: 'FR',
+      translations: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('refuse un slug avec des caractères invalides', () => {
+    const result = ArticleCreateInputSchema.safeParse({
+      slug: 'Le Patriarche Rencontre !',
+      originalLang: 'FR',
+      translations: [
+        {
+          language: 'FR',
+          title: 'Titre suffisant',
+          summary: 'Résumé suffisamment long.',
+          analysis: 'Analyse suffisamment longue.',
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
   });
 });
