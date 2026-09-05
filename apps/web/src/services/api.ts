@@ -3,6 +3,9 @@ import type {
   AdminCategory,
   AdminSource,
   AuthenticatedUser,
+  PublicArticle,
+  PublicArticleListItem,
+  PublicComment,
 } from '@orbis-fidei/types';
 import type {
   ArticleCreateInput,
@@ -136,6 +139,24 @@ export const api = {
       request<AdminArticle>(`/admin/articles/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(input),
+      }),
+  },
+
+  publicArticles: {
+    list: (lang = 'FR', page = 1) =>
+      request<{ items: PublicArticleListItem[]; total: number; page: number; pageSize: number }>(
+        `/articles?lang=${lang}&page=${page}`,
+      ),
+    get: (slug: string, lang = 'FR') =>
+      request<PublicArticle>(`/articles/${encodeURIComponent(slug)}?lang=${lang}`),
+  },
+
+  comments: {
+    list: (articleId: string) => request<PublicComment[]>(`/articles/${articleId}/comments`),
+    create: (articleId: string, content: string, parentId?: string) =>
+      request<PublicComment>(`/articles/${articleId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content, parentId }),
       }),
   },
 };

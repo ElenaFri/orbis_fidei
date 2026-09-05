@@ -78,3 +78,23 @@ export interface AdminArticle {
   translations: AdminArticleTranslation[];
   categories: { articleId: string; categoryId: string }[];
 }
+
+export interface PublicArticleListItem extends ArticleSummary {
+  sourceName?: string;
+}
+
+export interface PublicArticle extends ArticleDetail {
+  sourceUrl?: string;
+}
+
+export interface PublicComment {
+  id: string;
+  articleId: string;
+  authorId: string;
+  parentId: string | null;
+  content: string;
+  status: string;
+  createdAt: string;
+  author: { displayName: string };
+  replies?: PublicComment[];
+}

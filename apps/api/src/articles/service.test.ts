@@ -25,10 +25,12 @@ const translations: FakeTranslation[] = [];
 const articleCategories: { articleId: string; categoryId: string }[] = [];
 let nextId = 1;
 
-function withRelations(article: FakeArticle) {
+function withRelations(article: FakeArticle, translationLang?: string) {
   return {
     ...article,
-    translations: translations.filter((t) => t.articleId === article.id),
+    translations: translations.filter(
+      (t) => t.articleId === article.id && (!translationLang || t.language === translationLang),
+    ),
     categories: articleCategories
       .filter((c) => c.articleId === article.id)
       .map((c) => ({
@@ -36,19 +38,83 @@ function withRelations(article: FakeArticle) {
         categoryId: c.categoryId,
         category: { id: c.categoryId },
       })),
+    source: null,
+    _count: { comments: 0 },
   };
+}
+
+function matchesPublicWhere(article: FakeArticle, lang: string): boolean {
+  if (article.status !== 'PUBLISHED') return false;
+  return translations.some((t) => t.articleId === article.id && t.language === lang);
 }
 
 vi.mock('@orbis-fidei/database', () => ({
   prisma: {
     article: {
-      findMany: vi.fn(async () => [...articles.values()].map(withRelations)),
+      findMany: vi.fn(
+        async ({
+          where,
+          include,
+        }: {
+          where?: { status?: string; translations?: { some: { language: string } } };
+          include?: { translations?: { where?: { language?: string } } };
+        } = {}) => {
+          const lang = include?.translations?.where?.language;
+          let list = [...articles.values()];
+          if (where?.status === 'PUBLISHED' && where.translations) {
+            list = list.filter((a) => matchesPublicWhere(a, where.translations!.some.language));
+          }
+          return list.map((a) => withRelations(a, lang));
+        },
+      ),
+      findFirst: vi.fn(
+        async ({
+          where,
+          include,
+        }: {
+          where: { slug: string; status: string; translations: { some: { language: string } } };
+          include?: { translations?: { where?: { language?: string } } };
+        }) => {
+          const article = [...articles.values()].find(
+            (a) => a.slug === where.slug && matchesPublicWhere(a, where.translations.some.language),
+          );
+          const lang = include?.translations?.where?.language;
+          return article ? withRelations(article, lang) : null;
+        },
+      ),
+      count: vi.fn(
+        async ({
+          where,
+        }: {
+          where?: { status?: string; translations?: { some: { language: string } } };
+        } = {}) => {
+          let list = [...articles.values()];
+          if (where?.status === 'PUBLISHED' && where.translations) {
+            list = list.filter((a) => matchesPublicWhere(a, where.translations!.some.language));
+          }
+          return list.length;
+        },
+      ),
       findUnique: vi.fn(async ({ where }: { where: { id?: string; slug?: string } }) => {
         const article = where.id
           ? articles.get(where.id)
           : [...articles.values()].find((a) => a.slug === where.slug);
         return article ? withRelations(article) : null;
       }),
+      update: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: string };
+          data: { status: string; publishedAt: Date };
+        }) => {
+          const article = articles.get(where.id);
+          if (!article) throw new Error('not found');
+          Object.assign(article, data);
+          return withRelations(article);
+        },
+      ),
       create: vi.fn(
         async ({
           data,
@@ -217,5 +283,104 @@ describe('articles service', () => {
 
     const updated = await service.updateArticle(created.id, { categoryIds: ['cat_2', 'cat_3'] });
     expect(updated.categories.map((c) => c.categoryId).sort()).toEqual(['cat_2', 'cat_3']);
+  });
+});
+
+describe('publishArticle', () => {
+  afterEach(() => {
+    articles.clear();
+    translations.length = 0;
+    articleCategories.length = 0;
+  });
+
+  it('marks an article as published', async () => {
+    const created = await service.createArticle(
+      { slug: 'mon-article', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    expect(created.status).toBe('DRAFT');
+
+    const published = await service.publishArticle(created.id);
+    expect(published.status).toBe('PUBLISHED');
+    expect(published.publishedAt).toBeInstanceOf(Date);
+  });
+
+  it('throws a 404 error when publishing an unknown article', async () => {
+    await expect(service.publishArticle('unknown')).rejects.toThrow(service.ArticleError);
+  });
+});
+
+describe('listPublicArticles', () => {
+  afterEach(() => {
+    articles.clear();
+    translations.length = 0;
+    articleCategories.length = 0;
+  });
+
+  it('only returns published articles with a translation in the requested language', async () => {
+    const draft = await service.createArticle(
+      { slug: 'brouillon', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    const published = await service.createArticle(
+      { slug: 'publie', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    await service.publishArticle(published.id);
+    void draft;
+
+    const result = await service.listPublicArticles({ lang: 'FR' });
+    expect(result.articles).toHaveLength(1);
+    expect(result.articles[0]?.slug).toBe('publie');
+    expect(result.total).toBe(1);
+  });
+
+  it('excludes published articles without a translation in the requested language', async () => {
+    const created = await service.createArticle(
+      { slug: 'mon-article', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    await service.publishArticle(created.id);
+
+    const result = await service.listPublicArticles({ lang: 'EN' });
+    expect(result.articles).toHaveLength(0);
+  });
+});
+
+describe('getPublicArticleBySlug', () => {
+  afterEach(() => {
+    articles.clear();
+    translations.length = 0;
+    articleCategories.length = 0;
+  });
+
+  it('returns a published article by slug with the requested translation', async () => {
+    const created = await service.createArticle(
+      { slug: 'mon-article', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    await service.publishArticle(created.id);
+
+    const article = await service.getPublicArticleBySlug('mon-article', 'FR');
+    expect(article.translations).toHaveLength(1);
+    expect(article.translations[0]?.title).toBe(baseTranslation.title);
+  });
+
+  it('throws a 404 error for a draft article', async () => {
+    const created = await service.createArticle(
+      { slug: 'mon-article', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    void created;
+
+    await expect(service.getPublicArticleBySlug('mon-article', 'FR')).rejects.toThrow(
+      service.ArticleError,
+    );
+  });
+
+  it('throws a 404 error for an unknown slug', async () => {
+    await expect(service.getPublicArticleBySlug('unknown', 'FR')).rejects.toThrow(
+      service.ArticleError,
+    );
   });
 });

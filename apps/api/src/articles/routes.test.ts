@@ -66,6 +66,20 @@ vi.mock('@orbis-fidei/database', () => ({
           return withRelations(article);
         },
       ),
+      update: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: string };
+          data: { status: string; publishedAt: Date };
+        }) => {
+          const article = articles.get(where.id);
+          if (!article) throw new Error('not found');
+          Object.assign(article, data);
+          return withRelations(article);
+        },
+      ),
     },
     articleTranslation: { upsert: vi.fn() },
     articleCategory: { deleteMany: vi.fn(), createMany: vi.fn() },
@@ -218,5 +232,52 @@ describe('article routes', () => {
       payload: { categoryIds: [] },
     });
     expect(patchResponse.statusCode).toBe(200);
+  });
+
+  it("rejette la publication avec 403 sans la permission 'article.publish'", async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/admin/articles',
+      headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
+      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+    });
+    const { id } = created.json();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/admin/articles/${id}/publish`,
+      headers: { authorization: `Bearer ${await tokenWith([])}` },
+    });
+    expect(response.statusCode).toBe(403);
+  });
+
+  it('publishes an article with the required permission', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/admin/articles',
+      headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
+      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+    });
+    const { id } = created.json();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/admin/articles/${id}/publish`,
+      headers: { authorization: `Bearer ${await tokenWith(['article.publish'])}` },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().status).toBe('PUBLISHED');
+  });
+
+  it('returns 404 when publishing an unknown article', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/admin/articles/unknown/publish',
+      headers: { authorization: `Bearer ${await tokenWith(['article.publish'])}` },
+    });
+    expect(response.statusCode).toBe(404);
   });
 });

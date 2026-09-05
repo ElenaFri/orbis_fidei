@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "login": "Login",
+    "logout": "Logout",
+    "admin": "Admin"
+  },
+  "home": {
+    "title": "Orbis Fidei",
+    "tagline": "Christianity and spirituality around the world",
+    "empty": "No articles published yet. The portal is being set up."
+  },
+  "articles": {
+    "loading": "Loading articles…",
+    "loadError": "Unable to load articles.",
+    "unknownSource": "Unknown source",
+    "readMore": "Read article",
+    "comments": "{count} comment | {count} comments",
+    "analysis": "Orbis Fidei analysis",
+    "source": "Source:"
+  },
+  "comments": {
+    "title": "Discussion",
+    "empty": "No comments yet.",
+    "write": "Your comment",
+    "submit": "Post",
+    "loginRequired": "Log in to join the discussion.",
+    "loadError": "Unable to load comments.",
+    "postError": "Unable to post the comment."
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search for an article…",
+    "todo": "Search will be available in a future release."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The requested page does not exist.",
+    "back": "Back to home"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "registerTitle": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display name",
+    "submitLogin": "Log in",
+    "submitRegister": "Register",
+    "error": "Something went wrong."
+  },
+  "admin": {
+    "sources": "Sources",
+    "categories": "Categories",
+    "articles": "Articles",
+    "name": "Name",
+    "url": "URL",
+    "language": "Language",
+    "type": "Type",
+    "status": "Status",
+    "actions": "Actions",
+    "create": "Create",
+    "delete": "Delete",
+    "key": "Key",
+    "labelFr": "Label (FR)",
+    "labelEn": "Label (EN)",
+    "labelRu": "Label (RU)",
+    "slug": "Slug",
+    "originalLang": "Original language",
+    "title": "Title",
+    "summary": "Summary",
+    "analysis": "Analysis",
+    "noSources": "No sources yet.",
+    "noCategories": "No categories yet.",
+    "noArticles": "No articles yet.",
+    "error": "Something went wrong."
+  }
+}

@@ -247,4 +247,57 @@ describe('api client', () => {
       expect.objectContaining({ method: 'PATCH' }),
     );
   });
+
+  it('publicArticles.list() construit la requête paginée', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ items: [], total: 0, page: 2, pageSize: 20 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.publicArticles.list('EN', 2);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/articles?lang=EN&page=2'),
+      expect.anything(),
+    );
+  });
+
+  it('publicArticles.get() encode le slug', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'a1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.publicArticles.get('un slug');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/articles/un%20slug?lang=FR'),
+      expect.anything(),
+    );
+  });
+
+  it('comments.list() appelle le endpoint public des commentaires', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([]));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.comments.list('a1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/articles/a1/comments'),
+      expect.anything(),
+    );
+  });
+
+  it('comments.create() poste le contenu et la réponse éventuelle', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'comment_1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.comments.create('a1', 'Un commentaire.', 'comment_0');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/articles/a1/comments'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ content: 'Un commentaire.', parentId: 'comment_0' }),
+      }),
+    );
+  });
 });

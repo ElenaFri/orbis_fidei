@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "search": "Recherche",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "admin": "Administration"
+  },
+  "home": {
+    "title": "Orbis Fidei",
+    "tagline": "Chrétienté et spiritualité dans le monde",
+    "empty": "Aucun article publié pour l'instant. Le portail se met en place."
+  },
+  "articles": {
+    "loading": "Chargement des articles…",
+    "loadError": "Impossible de charger les articles.",
+    "unknownSource": "Source inconnue",
+    "readMore": "Lire l'article",
+    "comments": "{count} commentaire | {count} commentaires",
+    "analysis": "Analyse d’Orbis Fidei",
+    "source": "Source :"
+  },
+  "comments": {
+    "title": "Discussion",
+    "empty": "Aucun commentaire pour le moment.",
+    "write": "Votre commentaire",
+    "submit": "Publier",
+    "loginRequired": "Connectez-vous pour participer à la discussion.",
+    "loadError": "Impossible de charger les commentaires.",
+    "postError": "Impossible de publier le commentaire."
+  },
+  "search": {
+    "title": "Recherche",
+    "placeholder": "Rechercher un article…",
+    "todo": "La recherche sera disponible dans une prochaine version."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "message": "La page demandée n'existe pas.",
+    "back": "Retour à l'accueil"
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "registerTitle": "Créer un compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "displayName": "Nom affiché",
+    "submitLogin": "Se connecter",
+    "submitRegister": "S'inscrire",
+    "error": "Une erreur est survenue."
+  },
+  "admin": {
+    "sources": "Sources",
+    "categories": "Catégories",
+    "articles": "Articles",
+    "name": "Nom",
+    "url": "URL",
+    "language": "Langue",
+    "type": "Type",
+    "status": "Statut",
+    "actions": "Actions",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "key": "Clé",
+    "labelFr": "Libellé (FR)",
+    "labelEn": "Libellé (EN)",
+    "labelRu": "Libellé (RU)",
+    "slug": "Slug",
+    "originalLang": "Langue originale",
+    "title": "Titre",
+    "summary": "Résumé",
+    "analysis": "Analyse",
+    "noSources": "Aucune source pour le moment.",
+    "noCategories": "Aucune catégorie pour le moment.",
+    "noArticles": "Aucun article pour le moment.",
+    "error": "Une erreur est survenue."
+  }
+}

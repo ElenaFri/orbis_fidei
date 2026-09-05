@@ -1,5 +1,5 @@
 import { prisma } from '@orbis-fidei/database';
-import type { ArticleCreateInput, ArticleUpdateInput } from '@orbis-fidei/validation';
+import type { ArticleCreateInput, ArticleUpdateInput, Language } from '@orbis-fidei/validation';
 
 export class ArticleError extends Error {
   constructor(
@@ -64,4 +64,58 @@ export async function updateArticle(id: string, input: ArticleUpdateInput) {
   }
 
   return getArticle(id);
+}
+/** Minimal editorial transition: marks the article as published. No full workflow yet (see Phase 2.4/8). */
+export async function publishArticle(id: string) {
+  await getArticle(id);
+  return prisma.article.update({
+    where: { id },
+    data: { status: 'PUBLISHED', publishedAt: new Date() },
+    include: ARTICLE_INCLUDE,
+  });
+}
+
+const PUBLIC_PAGE_SIZE = 20;
+
+export interface PublicArticleListParams {
+  lang: Language;
+  page?: number;
+}
+
+/** Lists published articles that have a translation in the requested language. */
+export async function listPublicArticles({ lang, page = 1 }: PublicArticleListParams) {
+  const where = { status: 'PUBLISHED' as const, translations: { some: { language: lang } } };
+
+  const [articles, total] = await Promise.all([
+    prisma.article.findMany({
+      where,
+      include: {
+        translations: { where: { language: lang } },
+        categories: { include: { category: true } },
+        source: true,
+        _count: { select: { comments: true } },
+      },
+      orderBy: { publishedAt: 'desc' },
+      skip: (page - 1) * PUBLIC_PAGE_SIZE,
+      take: PUBLIC_PAGE_SIZE,
+    }),
+    prisma.article.count({ where }),
+  ]);
+
+  return { articles, total, page, pageSize: PUBLIC_PAGE_SIZE };
+}
+
+/** Gets a single published article by slug, with its translation in the requested language. */
+export async function getPublicArticleBySlug(slug: string, lang: Language) {
+  const article = await prisma.article.findFirst({
+    where: { slug, status: 'PUBLISHED', translations: { some: { language: lang } } },
+    include: {
+      translations: { where: { language: lang } },
+      categories: { include: { category: true } },
+      source: true,
+      _count: { select: { comments: true } },
+    },
+  });
+  if (!article) throw new ArticleError('Article introuvable.', 404);
+  return article;
 }

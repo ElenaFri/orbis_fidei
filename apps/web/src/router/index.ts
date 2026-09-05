@@ -5,6 +5,7 @@ import { adminGuard } from './guards.js';
 const HomeView = () => import('@/views/HomeView.vue');
 const SearchView = () => import('@/views/SearchView.vue');
 const AuthView = () => import('@/views/AuthView.vue');
+const ArticleView = () => import('@/views/ArticleView.vue');
 const NotFoundView = () => import('@/views/NotFoundView.vue');
 const AdminLayout = () => import('@/views/admin/AdminLayout.vue');
 const AdminSourcesView = () => import('@/views/admin/AdminSourcesView.vue');
@@ -24,6 +25,7 @@ export const router = createRouter({
     { path: '/', name: 'home', component: HomeView },
     { path: '/search', name: 'search', component: SearchView },
     { path: '/login', name: 'login', component: AuthView },
+    { path: '/a/:slug', name: 'article', component: ArticleView },
     {
       path: '/admin',
       component: AdminLayout,

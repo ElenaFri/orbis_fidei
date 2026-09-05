@@ -68,4 +68,19 @@ export async function registerArticleRoutes(app: FastifyInstance): Promise<void>
       }
     },
   );
+
+  app.post<{ Params: { id: string } }>(
+    '/admin/articles/:id/publish',
+    { preHandler: requirePermission('article.publish') },
+    async (request, reply) => {
+      try {
+        return await articleService.publishArticle(request.params.id);
+      } catch (error) {
+        if (error instanceof articleService.ArticleError) {
+          return reply.code(error.statusCode).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
 }

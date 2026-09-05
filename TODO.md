@@ -102,14 +102,14 @@ Objectif : API Fastify qui démarre, expose `/health`, structure par domaine.
 - [x] Sources : CRUD admin
 - [x] Catégories : CRUD admin (tags reportés — non requis par M2)
 - [~] Articles (lecture publique + admin) :
-  - [ ] `GET /articles?lang=fr&page=…` liste publique paginée (M3)
-  - [ ] `GET /articles/:slug` détail public (langue courante) (M3)
+  - [x] `GET /articles?lang=fr&page=…` liste publique paginée (M3)
+  - [x] `GET /articles/:slug` détail public (langue courante) (M3)
   - [x] `GET /admin/articles` liste admin (tous statuts)
   - [x] `POST /admin/articles` création manuelle (avec traductions imbriquées)
   - [x] `PATCH /admin/articles/:id` édition (traductions + catégories)
-  - [ ] `POST /admin/articles/:id/publish` transition d'état (hors scope M2, prévu avec le workflow éditorial)
+  - [x] `POST /admin/articles/:id/publish` transition minimale vers `PUBLISHED`
 - [ ] Propositions : `GET /admin/proposals`, `POST /admin/proposals/:id/accept|reject`
-- [ ] Commentaires : `GET /articles/:id/comments`, `POST /articles/:id/comments`, `POST /comments/:id/report`
+- [~] Commentaires : `GET /articles/:id/comments`, `POST /articles/:id/comments` ; signalement prévu ultérieurement
 - [ ] Modération commentaires : `PATCH /admin/comments/:id` (`hide`, `delete`)
 
 ### 2.4 Historique éditorial
@@ -127,7 +127,7 @@ Objectif : SPA Vue qui démarre, deux espaces (public + admin), i18n FR/EN/RU.
 
 - [x] `apps/web/package.json`, `vite.config.ts`, `tsconfig.json`
 - [x] Vue 3 + Vue Router + Pinia
-- [ ] Client API typé (fetch wrapper + gestion 401/refresh)
+- [x] Client API typé (fetch wrapper + gestion 401/refresh)
 - [x] `vue-i18n` avec dossiers `i18n/{fr,en,ru}/`
 - [~] Sélecteur de langue persistant (localStorage OK ; query param à ajouter)
 - [x] Détection langue navigateur au premier chargement
@@ -135,10 +135,10 @@ Objectif : SPA Vue qui démarre, deux espaces (public + admin), i18n FR/EN/RU.
 ### 3.2 Espace public
 
 - [x] Layout public (header, footer, sélecteur de langue)
-- [ ] Page **Accueil / Actualités** : liste compacte + dépliage inline
-- [ ] Composant `ArticleCard` (repliée ↔ dépliée)
-- [ ] Rendu clair : `title` / `summary` / `analysis` / `source`
-- [ ] Page **Article** (route dédiée pour le partage) `/a/:slug`
+- [x] Page **Accueil / Actualités** : liste compacte + dépliage inline
+- [x] Composant `ArticleCard` (repliée ↔ dépliée)
+- [x] Rendu clair : `title` / `summary` / `analysis` / `source`
+- [x] Page **Article** (route dédiée pour le partage) `/a/:slug`
 - [ ] Page **Recherche** avec filtres (langue, date, pays, catégorie, source, tags)
 - [ ] Page **Catégories** / listing par catégorie
 - [ ] Pages **Login / Register**
@@ -157,8 +157,8 @@ Objectif : SPA Vue qui démarre, deux espaces (public + admin), i18n FR/EN/RU.
 
 ### 3.4 Commentaires
 
-- [ ] Composant `CommentThread` (imbrication)
-- [ ] Formulaire de réponse
+- [x] Composant `CommentThread` (imbrication)
+- [~] Formulaire de commentaire top-level ; réponse imbriquée à approfondir
 - [ ] Signalement + modification / suppression de ses propres commentaires
 
 ---
@@ -261,7 +261,7 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - **M0 — Site vierge qui démarre** ✅ _code en place_ — reste à exécuter en local : `pnpm install`, `pnpm docker:up`, `pnpm db:migrate`, `pnpm dev`.
 - **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin, formulaires d'inscription/connexion.
 - **M2 — Backoffice minimal** ✅ : CRUD sources/catégories, création manuelle d'article (API + backoffice `/admin`).
-- **M3 — Interface publique** _(prochaine cible)_ : liste d'articles + article détaillé + commentaires + i18n.
+- **M3 — Interface publique** ✅ _socle livré_ : liste compacte, dépliage inline, détail `/a/:slug`, commentaires top-level, i18n FR/EN/RU. Recherche/filtres et réponses imbriquées restent à approfondir.
 - **M4 — Agrégation RSS** : worker aggregator + propositions dans le back-office.
 - **M5 — IA (résumé + classification + doublons)** : worker analyzer.
 - **M6 — Traduction automatique** : worker translator + relecture.

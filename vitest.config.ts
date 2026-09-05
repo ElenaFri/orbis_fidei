@@ -46,6 +46,7 @@ export default defineConfig({
           lines: 90,
         },
         'apps/api/src/articles/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
+        'apps/api/src/comments/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/services/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/stores/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/router/guards.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
