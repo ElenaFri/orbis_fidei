@@ -49,6 +49,17 @@ pnpm --filter @orbis-fidei/analyzer   dev
 pnpm --filter @orbis-fidei/translator dev
 ```
 
+Pour vérifier ponctuellement l'agrégateur, ajoutez d'abord une source active dans
+`/admin/sources`, puis lancez :
+
+```bash
+pnpm --filter @orbis-fidei/aggregator aggregate:once
+```
+
+Cette commande collecte les éléments dans `SourceItem` et les place dans la file
+`analysis`. Elle ne publie jamais directement un article : la publication reste
+sous contrôle éditorial humain.
+
 Voir [TODO.md](TODO.md) pour la feuille de route détaillée.
 
 ---

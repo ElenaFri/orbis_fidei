@@ -1,1 +1,7 @@
-export default ['apps/api', 'apps/web', 'packages/config', 'packages/validation'];
+export default [
+  'apps/api',
+  'apps/web',
+  'packages/config',
+  'packages/validation',
+  'workers/aggregator',
+];

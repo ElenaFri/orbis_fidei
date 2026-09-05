@@ -174,10 +174,10 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ### 4.2 `workers/aggregator`
 
-- [ ] Cron : parcourt les `Source` actives
-- [ ] Récupération RSS / Atom (avec ETag / Last-Modified)
-- [ ] Insertion `SourceItem` (déduplication sur URL + hash contenu)
-- [ ] Enqueue `analyze` pour chaque nouvel item
+- [x] Polling configurable : parcourt les `Source` actives au démarrage puis périodiquement
+- [~] Récupération RSS / Atom (avec `If-Modified-Since` ; ETag à ajouter)
+- [x] Insertion `SourceItem` (déduplication sur URL + hash SHA-256 du contenu)
+- [x] Enqueue `analysis` pour chaque nouvel item
 
 ### 4.3 `workers/analyzer`
 
@@ -262,7 +262,7 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin, formulaires d'inscription/connexion.
 - **M2 — Backoffice minimal** ✅ : CRUD sources/catégories, création manuelle d'article (API + backoffice `/admin`).
 - **M3 — Interface publique** ✅ _socle livré_ : liste compacte, dépliage inline, détail `/a/:slug`, commentaires top-level, i18n FR/EN/RU. Recherche/filtres et réponses imbriquées restent à approfondir.
-- **M4 — Agrégation RSS** : worker aggregator + propositions dans le back-office.
+- **M4 — Agrégation RSS** ✅ _socle aggregator livré_ : polling des sources actives, RSS/Atom, déduplication, `SourceItem`, jobs `analysis`. ETag et worker analyzer restent à faire.
 - **M5 — IA (résumé + classification + doublons)** : worker analyzer.
 - **M6 — Traduction automatique** : worker translator + relecture.
 - **M7 — MVP livrable** : tous les critères de la section 20 du cahier des charges.

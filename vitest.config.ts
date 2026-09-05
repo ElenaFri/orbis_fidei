@@ -30,6 +30,8 @@ export default defineConfig({
         'apps/web/src/i18n/**',
         // Workers not implemented yet: stubs with no logic.
         'workers/**/src/main.ts',
+        // Worker command entrypoint: orchestration only, covered through aggregator.ts tests.
+        'workers/aggregator/src/runOnce.ts',
         // Shared test utilities (test helpers), not application logic.
         '**/test-utils/**',
       ],
@@ -50,6 +52,12 @@ export default defineConfig({
         'apps/web/src/services/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/stores/**/*.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
         'apps/web/src/router/guards.ts': { statements: 90, branches: 80, functions: 90, lines: 90 },
+        'workers/aggregator/src/aggregator.ts': {
+          statements: 90,
+          branches: 80,
+          functions: 90,
+          lines: 90,
+        },
       },
     },
   },
