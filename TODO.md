@@ -181,11 +181,11 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ### 4.3 `workers/analyzer`
 
-- [ ] Détection langue (`franc` ou équivalent)
-- [ ] Classification catégorie (règles simples puis IA)
-- [ ] Détection doublons / similarité (embedding + seuil)
-- [ ] Génération résumé (via provider IA abstrait)
-- [ ] Création d'un `ArticleProposal`
+- [x] Détection langue (langue originale conservée ; détection avancée à approfondir)
+- [x] Classification catégorie (provider IA/fake, catégorie de secours `other`)
+- [~] Détection doublons / similarité (déduplication SourceItem déjà faite ; similarité sémantique à approfondir)
+- [x] Génération résumé (via `AIProvider` abstrait)
+- [x] Création idempotente d'un `ArticleProposal`
 
 ### 4.4 `workers/translator`
 
@@ -196,9 +196,9 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ### 4.5 Abstraction fournisseur IA
 
-- [ ] Interface `AIProvider` (summarize, translate, classify, embed)
-- [ ] Implémentation par défaut + config via `.env`
-- [ ] Rate-limit + retry exponentiel côté worker
+- [x] Interface `AIProvider` (analyse structurée pour M5 ; summarize/classify/embed à étendre)
+- [x] Provider fake par défaut + provider OpenAI REST configurable via `.env`
+- [~] Retry borné côté analyzer ; rate-limit fournisseur à ajouter
 
 ---
 
@@ -227,8 +227,8 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ## Phase 7 — Qualité & CI
 
-- [~] Tests unitaires : Vitest configuré ; tests d'amorçage sur `packages/validation`, `packages/config`, `apps/api` (health). Couverture à étendre au fil des features.
-- [~] Tests d'intégration API : `GET /health` couvert via `app.inject()`. Reste : auth, articles, commentaires (à faire au fil des phases).
+- [x] Tests unitaires : Vitest configuré ; couverture par seuils de jalon (M1–M5) appliquée.
+- [~] Tests d'intégration API : auth, articles, commentaires et agrégateur couverts ; parcours navigateur Playwright restant.
 - [ ] Tests e2e minimaux (Playwright) sur les parcours publics
 - [x] GitHub Actions : lint + type-check + tests + build sur PR (`.github/workflows/ci.yml`)
 - [x] Vérification des migrations en CI (Prisma `validate` + `format --check`)
@@ -262,7 +262,7 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - **M1 — Authentification & RBAC** ✅ _API backend_ : register/login/refresh/logout, `GET /me`, `requirePermission`, seed admin, formulaires d'inscription/connexion.
 - **M2 — Backoffice minimal** ✅ : CRUD sources/catégories, création manuelle d'article (API + backoffice `/admin`).
 - **M3 — Interface publique** ✅ _socle livré_ : liste compacte, dépliage inline, détail `/a/:slug`, commentaires top-level, i18n FR/EN/RU. Recherche/filtres et réponses imbriquées restent à approfondir.
-- **M4 — Agrégation RSS** ✅ _socle aggregator livré_ : polling des sources actives, RSS/Atom, déduplication, `SourceItem`, jobs `analysis`. ETag et worker analyzer restent à faire.
-- **M5 — IA (résumé + classification + doublons)** : worker analyzer.
+- **M4 — Agrégation RSS** ✅ _socle aggregator livré_ : polling des sources actives, RSS/Atom, déduplication, `SourceItem`, jobs `analysis`. ETag reste à faire.
+- **M5 — IA (résumé + classification + doublons)** ✅ _socle analyzer livré_ : provider fake/OpenAI, résumé, catégorie, ArticleProposal idempotente. Similarité sémantique et embeddings restent à approfondir.
 - **M6 — Traduction automatique** : worker translator + relecture.
 - **M7 — MVP livrable** : tous les critères de la section 20 du cahier des charges.
