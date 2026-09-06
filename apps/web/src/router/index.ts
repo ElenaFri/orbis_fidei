@@ -11,6 +11,7 @@ const AdminLayout = () => import('@/views/admin/AdminLayout.vue');
 const AdminSourcesView = () => import('@/views/admin/AdminSourcesView.vue');
 const AdminCategoriesView = () => import('@/views/admin/AdminCategoriesView.vue');
 const AdminArticlesView = () => import('@/views/admin/AdminArticlesView.vue');
+const AdminArticleDetailView = () => import('@/views/admin/AdminArticleDetailView.vue');
 const AdminSuggestionsView = () => import('@/views/admin/AdminSuggestionsView.vue');
 const AdminUsersView = () => import('@/views/admin/AdminUsersView.vue');
 
@@ -62,6 +63,12 @@ export const router = createRouter({
           name: 'admin-articles',
           component: AdminArticlesView,
           meta: { requiresPermission: 'article.create' },
+        },
+        {
+          path: 'articles/:id',
+          name: 'admin-article-detail',
+          component: AdminArticleDetailView,
+          meta: { requiresPermission: 'article.read' },
         },
       ],
     },

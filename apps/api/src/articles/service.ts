@@ -75,6 +75,11 @@ export async function publishArticle(id: string) {
   });
 }
 
+export async function deleteArticle(id: string): Promise<void> {
+  await getArticle(id);
+  await prisma.article.delete({ where: { id } });
+}
+
 const PUBLIC_PAGE_SIZE = 20;
 
 export interface PublicArticleListParams {

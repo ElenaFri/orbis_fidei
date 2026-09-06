@@ -35,6 +35,12 @@ export async function registerArticleRoutes(app: FastifyInstance): Promise<void>
           .send({ error: 'Requête invalide.', details: parsed.error.flatten() });
       }
 
+      if (!parsed.data.sourceId) {
+        return reply
+          .code(400)
+          .send({ error: 'Une source est obligatoire pour un article manuel.' });
+      }
+
       try {
         const article = await articleService.createArticle(parsed.data, request.currentUser!.id);
         return reply.code(201).send(article);
@@ -75,6 +81,22 @@ export async function registerArticleRoutes(app: FastifyInstance): Promise<void>
     async (request, reply) => {
       try {
         return await articleService.publishArticle(request.params.id);
+      } catch (error) {
+        if (error instanceof articleService.ArticleError) {
+          return reply.code(error.statusCode).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.delete<{ Params: { id: string } }>(
+    '/admin/articles/:id',
+    { preHandler: requirePermission('article.edit') },
+    async (request, reply) => {
+      try {
+        await articleService.deleteArticle(request.params.id);
+        return reply.code(204).send();
       } catch (error) {
         if (error instanceof articleService.ArticleError) {
           return reply.code(error.statusCode).send({ error: error.message });

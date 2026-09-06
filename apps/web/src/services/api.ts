@@ -86,7 +86,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({ error: response.statusText }));
-    throw new ApiError(body.error ?? 'Erreur inconnue.', response.status);
+    const validationErrors = Object.values(
+      (body.details?.fieldErrors ?? {}) as Record<string, string[]>,
+    )
+      .flat()
+      .join(' ');
+    throw new ApiError(validationErrors || body.error || 'Erreur inconnue.', response.status);
   }
 
   if (response.status === 204) return undefined as T;
@@ -143,6 +148,9 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify(input),
       }),
+    publish: (id: string) =>
+      request<AdminArticle>(`/admin/articles/${id}/publish`, { method: 'POST' }),
+    remove: (id: string) => request<void>(`/admin/articles/${id}`, { method: 'DELETE' }),
   },
 
   publicArticles: {

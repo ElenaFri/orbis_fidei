@@ -80,6 +80,9 @@ vi.mock('@orbis-fidei/database', () => ({
           return withRelations(article);
         },
       ),
+      delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+        articles.delete(where.id);
+      }),
     },
     articleTranslation: { upsert: vi.fn() },
     articleCategory: { deleteMany: vi.fn(), createMany: vi.fn() },
@@ -127,7 +130,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: auth,
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
     });
     expect(created.statusCode).toBe(201);
 
@@ -141,7 +149,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [],
+      },
     });
     expect(response.statusCode).toBe(400);
   });
@@ -153,7 +166,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: createAuth,
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
     });
     const { id } = created.json();
 
@@ -194,7 +212,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: createAuth,
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
     });
     const { id } = created.json();
 
@@ -214,7 +237,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: createAuth,
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
     });
     const { id } = created.json();
 
@@ -240,7 +268,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
     });
     const { id } = created.json();
 
@@ -258,7 +291,12 @@ describe('article routes', () => {
       method: 'POST',
       url: '/admin/articles',
       headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
-      payload: { slug: 'mon-article', originalLang: 'FR', translations: [validTranslation] },
+      payload: {
+        slug: 'mon-article',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
     });
     const { id } = created.json();
 
@@ -269,6 +307,29 @@ describe('article routes', () => {
     });
     expect(response.statusCode).toBe(200);
     expect(response.json().status).toBe('PUBLISHED');
+  });
+
+  it('deletes a draft with article.edit permission', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/admin/articles',
+      headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
+      payload: {
+        slug: 'draft',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
+    });
+    const { id } = created.json();
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: `/admin/articles/${id}`,
+      headers: { authorization: `Bearer ${await tokenWith(['article.edit'])}` },
+    });
+    expect(response.statusCode).toBe(204);
   });
 
   it('returns 404 when publishing an unknown article', async () => {

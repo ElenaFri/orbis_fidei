@@ -248,6 +248,30 @@ describe('api client', () => {
     );
   });
 
+  it('articles.publish() envoie la décision de publication', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'a1', status: 'PUBLISHED' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.articles.publish('a1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/articles/a1/publish'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('articles.remove() envoie la suppression du brouillon', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.articles.remove('a1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/articles/a1'),
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
   it('proposals.list() interroge la file de modération', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse([]));
     vi.stubGlobal('fetch', fetchMock);

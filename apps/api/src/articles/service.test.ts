@@ -115,6 +115,9 @@ vi.mock('@orbis-fidei/database', () => ({
           return withRelations(article);
         },
       ),
+      delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+        articles.delete(where.id);
+      }),
       create: vi.fn(
         async ({
           data,
@@ -307,6 +310,32 @@ describe('publishArticle', () => {
 
   it('throws a 404 error when publishing an unknown article', async () => {
     await expect(service.publishArticle('unknown')).rejects.toThrow(service.ArticleError);
+  });
+});
+
+describe('deleteArticle', () => {
+  afterEach(() => {
+    articles.clear();
+    translations.length = 0;
+    articleCategories.length = 0;
+  });
+
+  it('deletes a draft article', async () => {
+    const created = await service.createArticle(
+      { slug: 'draft', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    await service.deleteArticle(created.id);
+    await expect(service.getArticle(created.id)).rejects.toThrow(service.ArticleError);
+  });
+
+  it('deletes published articles when requested by an authorized editor', async () => {
+    const created = await service.createArticle(
+      { slug: 'published', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    await service.publishArticle(created.id);
+    await expect(service.deleteArticle(created.id)).resolves.toBeUndefined();
   });
 });
 
