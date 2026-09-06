@@ -3,6 +3,7 @@ import type { AdminRole, AdminUser } from '@orbis-fidei/types';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import { translateRole } from '@/i18n/roles';
 import { ApiError, api } from '@/services/api';
 
 const { t } = useI18n();
@@ -21,6 +22,10 @@ async function load() {
 
 function roleIds(user: AdminUser): string[] {
   return user.roles.map(({ role }) => role.id);
+}
+
+function roleLabel(roleName: string): string {
+  return translateRole(t, roleName);
 }
 
 async function updateRoles(user: AdminUser, event: Event) {
@@ -74,13 +79,17 @@ onMounted(load);
           <td>{{ user.displayName }}</td>
           <td>{{ user.email }}</td>
           <td>
+            <label class="sr-only" :for="`roles-${user.id}`">{{ t('admin.roles') }}</label>
             <select
+              :id="`roles-${user.id}`"
               multiple
               :value="roleIds(user)"
               :disabled="busyId === user.id"
               @change="updateRoles(user, $event)"
             >
-              <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
+              <option v-for="role in roles" :key="role.id" :value="role.id">
+                {{ roleLabel(role.name) }}
+              </option>
             </select>
           </td>
           <td>{{ user.isActive ? t('admin.active') : t('admin.inactive') }}</td>

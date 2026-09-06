@@ -280,6 +280,36 @@ describe('api client', () => {
     );
   });
 
+  it('users.list() interroge la liste admin', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([]));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.users.list();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/users'),
+      expect.anything(),
+    );
+  });
+
+  it('users.roles() interroge les rôles disponibles', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([]));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.users.roles();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/roles'),
+      expect.anything(),
+    );
+  });
+
+  it('users.update() envoie les nouveaux rôles', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'user_1' }));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.users.update('user_1', { roleIds: ['role_admin'] });
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/users/user_1'),
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+  });
+
   it('publicArticles.list() construit la requête paginée', async () => {
     const fetchMock = vi
       .fn()

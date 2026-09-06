@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
+import { translateRole } from '@/i18n/roles';
 import { useAuthStore } from '@/stores/auth';
 
 const { t } = useI18n();
@@ -11,6 +12,10 @@ const router = useRouter();
 
 const isOpen = ref(false);
 const rootEl = ref<HTMLElement | null>(null);
+
+const translatedRoles = computed(
+  () => auth.user?.roles?.map((role) => translateRole(t, role)).join(', ') || t('nav.member'),
+);
 
 const initials = computed(() => {
   const name = auth.user?.displayName ?? '';
@@ -61,7 +66,7 @@ async function onLogout() {
         {{ auth.user?.displayName }}
       </p>
       <p class="dropdown-role">
-        {{ auth.user?.roles?.join(', ') || t('nav.member') }}
+        {{ translatedRoles }}
       </p>
       <button type="button" class="dropdown-action" role="menuitem" @click="onLogout">
         {{ t('nav.logout') }}

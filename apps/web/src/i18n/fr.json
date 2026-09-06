@@ -7,6 +7,13 @@
     "admin": "Administration",
     "member": "Membre"
   },
+  "roles": {
+    "ADMIN": "Administrateur",
+    "EDITOR_IN_CHIEF": "Responsable éditorial",
+    "MODERATOR": "Modérateur",
+    "TRANSLATOR": "Traducteur",
+    "REGISTERED_USER": "Utilisateur inscrit"
+  },
   "home": {
     "title": "Orbis Fidei",
     "tagline": "Chrétienté et spiritualité dans le monde",

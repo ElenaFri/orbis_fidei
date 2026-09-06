@@ -7,6 +7,13 @@
     "admin": "Администрирование",
     "member": "Участник"
   },
+  "roles": {
+    "ADMIN": "Администратор",
+    "EDITOR_IN_CHIEF": "Главный редактор",
+    "MODERATOR": "Модератор",
+    "TRANSLATOR": "Переводчик",
+    "REGISTERED_USER": "Зарегистрированный пользователь"
+  },
   "home": {
     "title": "Orbis Fidei",
     "tagline": "Новости христиан со всего мира",
