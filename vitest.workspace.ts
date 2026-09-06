@@ -5,4 +5,5 @@ export default [
   'packages/validation',
   'workers/aggregator',
   'workers/analyzer',
+  'workers/translator',
 ];

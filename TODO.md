@@ -189,10 +189,10 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ### 4.4 `workers/translator`
 
-- [ ] Déclenché à `Article.APPROVED`
-- [ ] Un job par langue cible (EN, RU)
-- [ ] Traduction `title` / `summary` / `analysis`
-- [ ] `ArticleTranslation.status = TRANSLATED` (relecture humaine requise)
+- [x] Déclenché par un job ciblé ou un article approuvé
+- [x] Un job par langue cible (EN, RU)
+- [x] Traduction `title` / `summary` / `analysis`
+- [x] `ArticleTranslation.status = TRANSLATED` + `isMachine = true` (relecture humaine requise)
 
 ### 4.5 Abstraction fournisseur IA
 
@@ -264,5 +264,5 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - **M3 — Interface publique** ✅ _socle livré_ : liste compacte, dépliage inline, détail `/a/:slug`, commentaires top-level, i18n FR/EN/RU. Recherche/filtres et réponses imbriquées restent à approfondir.
 - **M4 — Agrégation RSS** ✅ _socle aggregator livré_ : polling des sources actives, RSS/Atom, déduplication, `SourceItem`, jobs `analysis`. ETag reste à faire.
 - **M5 — IA (résumé + classification + doublons)** ✅ _socle analyzer livré_ : provider fake/OpenAI, résumé, catégorie, ArticleProposal idempotente. Similarité sémantique et embeddings restent à approfondir.
-- **M6 — Traduction automatique** : worker translator + relecture.
+- **M6 — Traduction automatique** ✅ _socle translator livré_ : provider fake/OpenAI configurable, jobs EN/RU idempotents, traductions machine marquées `TRANSLATED`. Relecture humaine et déclenchement événementiel fin restent à approfondir.
 - **M7 — MVP livrable** : tous les critères de la section 20 du cahier des charges.
