@@ -13,6 +13,7 @@ import { registerCategoryRoutes } from './categories/routes.js';
 import { registerCommentRoutes } from './comments/routes.js';
 import { config } from './config.js';
 import { registerHealthRoutes } from './health/routes.js';
+import { registerProposalRoutes } from './proposals/routes.js';
 import { registerSourceRoutes } from './sources/routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -43,6 +44,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(registerArticleRoutes);
   await app.register(registerPublicArticleRoutes);
   await app.register(registerCommentRoutes);
+  await app.register(registerProposalRoutes);
 
   return app;
 }

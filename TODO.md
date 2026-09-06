@@ -108,7 +108,7 @@ Objectif : API Fastify qui démarre, expose `/health`, structure par domaine.
   - [x] `POST /admin/articles` création manuelle (avec traductions imbriquées)
   - [x] `PATCH /admin/articles/:id` édition (traductions + catégories)
   - [x] `POST /admin/articles/:id/publish` transition minimale vers `PUBLISHED`
-- [ ] Propositions : `GET /admin/proposals`, `POST /admin/proposals/:id/accept|reject`
+- [x] Propositions : `GET /admin/suggestions`, `POST /admin/suggestions/:id/accept|reject`
 - [~] Commentaires : `GET /articles/:id/comments`, `POST /articles/:id/comments` ; signalement prévu ultérieurement
 - [ ] Modération commentaires : `PATCH /admin/comments/:id` (`hide`, `delete`)
 
@@ -147,7 +147,7 @@ Objectif : SPA Vue qui démarre, deux espaces (public + admin), i18n FR/EN/RU.
 
 - [x] Garde de route : redirection si non authentifié / non autorisé (`router/guards.ts`)
 - [x] Layout admin (sidebar filtrée par permissions)
-- [ ] `/admin/suggestions` : file des propositions
+- [x] `/admin/suggestions` : file des propositions avec acceptation/rejet
 - [x] `/admin/articles` : liste + création (édition multi-langue à approfondir)
 - [ ] `/admin/translations` : traductions à relire
 - [ ] `/admin/comments` : modération
@@ -264,5 +264,5 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - **M3 — Interface publique** ✅ _socle livré_ : liste compacte, dépliage inline, détail `/a/:slug`, commentaires top-level, i18n FR/EN/RU. Recherche/filtres et réponses imbriquées restent à approfondir.
 - **M4 — Agrégation RSS** ✅ _socle aggregator livré_ : polling des sources actives, RSS/Atom, déduplication, `SourceItem`, jobs `analysis`. ETag reste à faire.
 - **M5 — IA (résumé + classification + doublons)** ✅ _socle analyzer livré_ : provider fake/OpenAI, résumé, catégorie, ArticleProposal idempotente. Similarité sémantique et embeddings restent à approfondir.
-- **M6 — Traduction automatique** ✅ _socle translator livré_ : provider fake/OpenAI configurable, jobs EN/RU idempotents, traductions machine marquées `TRANSLATED`. Relecture humaine et déclenchement événementiel fin restent à approfondir.
+- **M6 — Traduction automatique** ✅ _socle translator + modération livré_ : provider fake/OpenAI configurable, jobs EN/RU idempotents, propositions acceptables/rejetables, traductions machine marquées `TRANSLATED`. Relecture humaine et déclenchement événementiel fin restent à approfondir.
 - **M7 — MVP livrable** : tous les critères de la section 20 du cahier des charges.

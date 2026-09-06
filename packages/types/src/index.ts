@@ -98,3 +98,21 @@ export interface PublicComment {
   author: { displayName: string };
   replies?: PublicComment[];
 }
+
+export interface AdminProposal {
+  id: string;
+  status: string;
+  suggestedTitle: string | null;
+  suggestedSummary: string | null;
+  suggestedCategory: string | null;
+  confidence: number | null;
+  createdAt: string;
+  sourceItem: {
+    id: string;
+    originalTitle: string;
+    originalContent: string;
+    originalUrl: string;
+    originalLanguage: Language;
+    source: { name: string; url: string };
+  };
+}

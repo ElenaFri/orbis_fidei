@@ -50,6 +50,7 @@
     "error": "Something went wrong."
   },
   "admin": {
+    "suggestions": "Suggestions",
     "sources": "Sources",
     "categories": "Categories",
     "articles": "Articles",
@@ -73,6 +74,12 @@
     "noSources": "No sources yet.",
     "noCategories": "No categories yet.",
     "noArticles": "No articles yet.",
-    "error": "Something went wrong."
+    "error": "Something went wrong.",
+    "noSuggestions": "No pending suggestions.",
+    "category": "Category",
+    "confidence": "Confidence",
+    "openSource": "Open source",
+    "accept": "Accept",
+    "reject": "Reject"
   }
 }

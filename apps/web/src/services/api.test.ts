@@ -248,6 +248,38 @@ describe('api client', () => {
     );
   });
 
+  it('proposals.list() interroge la file de modération', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([]));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.proposals.list();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/suggestions'),
+      expect.anything(),
+    );
+  });
+
+  it('proposals.accept() envoie la décision au backend', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'article_1' }));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.proposals.accept('proposal_1');
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/suggestions/proposal_1/accept'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('proposals.reject() envoie le rejet au backend', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ id: 'proposal_1', status: 'REJECTED' }));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.proposals.reject('proposal_1');
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/admin/suggestions/proposal_1/reject'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
   it('publicArticles.list() construit la requête paginée', async () => {
     const fetchMock = vi
       .fn()

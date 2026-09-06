@@ -6,6 +6,7 @@ import type {
   PublicArticle,
   PublicArticleListItem,
   PublicComment,
+  AdminProposal,
 } from '@orbis-fidei/types';
 import type {
   ArticleCreateInput,
@@ -158,5 +159,13 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ content, parentId }),
       }),
+  },
+
+  proposals: {
+    list: () => request<AdminProposal[]>('/admin/suggestions'),
+    accept: (id: string) =>
+      request<AdminArticle>(`/admin/suggestions/${id}/accept`, { method: 'POST' }),
+    reject: (id: string) =>
+      request<AdminProposal>(`/admin/suggestions/${id}/reject`, { method: 'POST' }),
   },
 };

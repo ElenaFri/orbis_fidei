@@ -11,6 +11,9 @@ const auth = useAuthStore();
 <template>
   <div class="admin-layout">
     <aside class="admin-sidebar">
+      <RouterLink v-if="auth.hasPermission('proposal.review')" :to="{ name: 'admin-suggestions' }">
+        {{ t('admin.suggestions') }}
+      </RouterLink>
       <RouterLink v-if="auth.hasPermission('source.manage')" :to="{ name: 'admin-sources' }">
         {{ t('admin.sources') }}
       </RouterLink>

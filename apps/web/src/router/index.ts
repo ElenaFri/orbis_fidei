@@ -11,6 +11,7 @@ const AdminLayout = () => import('@/views/admin/AdminLayout.vue');
 const AdminSourcesView = () => import('@/views/admin/AdminSourcesView.vue');
 const AdminCategoriesView = () => import('@/views/admin/AdminCategoriesView.vue');
 const AdminArticlesView = () => import('@/views/admin/AdminArticlesView.vue');
+const AdminSuggestionsView = () => import('@/views/admin/AdminSuggestionsView.vue');
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -31,6 +32,12 @@ export const router = createRouter({
       component: AdminLayout,
       children: [
         { path: '', redirect: { name: 'admin-sources' } },
+        {
+          path: 'suggestions',
+          name: 'admin-suggestions',
+          component: AdminSuggestionsView,
+          meta: { requiresPermission: 'proposal.review' },
+        },
         {
           path: 'sources',
           name: 'admin-sources',

@@ -50,6 +50,7 @@
     "error": "Une erreur est survenue."
   },
   "admin": {
+    "suggestions": "Suggestions",
     "sources": "Sources",
     "categories": "Catégories",
     "articles": "Articles",
@@ -73,6 +74,12 @@
     "noSources": "Aucune source pour le moment.",
     "noCategories": "Aucune catégorie pour le moment.",
     "noArticles": "Aucun article pour le moment.",
-    "error": "Une erreur est survenue."
+    "error": "Une erreur est survenue.",
+    "noSuggestions": "Aucune suggestion en attente.",
+    "category": "Catégorie",
+    "confidence": "Confiance",
+    "openSource": "Ouvrir la source",
+    "accept": "Accepter",
+    "reject": "Rejeter"
   }
 }
