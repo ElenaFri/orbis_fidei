@@ -71,4 +71,57 @@ describe('proposal routes', () => {
     });
     expect(response.statusCode).toBe(200);
   });
+
+  it('gets a suggestion by id', async () => {
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'GET',
+      url: '/admin/suggestions/proposal_1',
+      headers: { authorization: `Bearer ${token(['proposal.review'])}` },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ id: 'proposal_1', status: 'PENDING' });
+  });
+
+  it('handles not found on get suggestion', async () => {
+    const service = await import('./service.js');
+    vi.mocked(service.getProposal).mockRejectedValueOnce(
+      new service.ProposalError('Proposition introuvable.', 404),
+    );
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'GET',
+      url: '/admin/suggestions/unknown',
+      headers: { authorization: `Bearer ${token(['proposal.review'])}` },
+    });
+    expect(response.statusCode).toBe(404);
+  });
+
+  it('handles service errors on accept', async () => {
+    const service = await import('./service.js');
+    vi.mocked(service.acceptProposal).mockRejectedValueOnce(
+      new service.ProposalError('Cette proposition a déjà été traitée.', 409),
+    );
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/admin/suggestions/proposal_1/accept',
+      headers: { authorization: `Bearer ${token(['proposal.review'])}` },
+    });
+    expect(response.statusCode).toBe(409);
+  });
+
+  it('handles service errors on reject', async () => {
+    const service = await import('./service.js');
+    vi.mocked(service.rejectProposal).mockRejectedValueOnce(
+      new service.ProposalError('Cette proposition a déjà été traitée.', 409),
+    );
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/admin/suggestions/proposal_1/reject',
+      headers: { authorization: `Bearer ${token(['proposal.review'])}` },
+    });
+    expect(response.statusCode).toBe(409);
+  });
 });

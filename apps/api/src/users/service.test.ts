@@ -97,6 +97,16 @@ describe('user management service', () => {
     await expect(service.listRoles()).resolves.toHaveLength(1);
   });
 
+  it('gets a user by id', async () => {
+    seedUser();
+    const user = await service.getUser('user_1');
+    expect(user.id).toBe('user_1');
+  });
+
+  it('rejects getting an unknown user', async () => {
+    await expect(service.getUser('unknown')).rejects.toThrow('introuvable');
+  });
+
   it('updates roles and increments token version', async () => {
     seedUser();
     roles.set('role_editor', { id: 'role_editor', name: 'EDITOR_IN_CHIEF' });
@@ -117,6 +127,21 @@ describe('user management service', () => {
     await expect(service.updateUser('user_1', { isActive: false, roleIds: [] })).rejects.toThrow(
       'dernier administrateur',
     );
+  });
+
+  it('allows updating administrator when other active admins exist', async () => {
+    seedUser({
+      id: 'user_1',
+      roles: [{ roleId: 'role_admin', role: { id: 'role_admin', name: 'ADMIN' } }],
+    });
+    seedUser({
+      id: 'user_2',
+      roles: [{ roleId: 'role_admin', role: { id: 'role_admin', name: 'ADMIN' } }],
+    });
+    roles.set('role_admin', { id: 'role_admin', name: 'ADMIN' });
+    roles.set('role_user', { id: 'role_user', name: 'REGISTERED_USER' });
+    const updated = await service.updateUser('user_1', { roleIds: ['role_user'] });
+    expect(updated.id).toBe('user_1');
   });
 
   it('rejects an unknown user', async () => {

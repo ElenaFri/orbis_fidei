@@ -63,4 +63,58 @@ describe('user management routes', () => {
     });
     expect(response.statusCode).toBe(200);
   });
+
+  it('gets a user by id', async () => {
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'GET',
+      url: '/admin/users/user_1',
+      headers: { authorization: `Bearer ${token(['user.manage'])}` },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ id: 'user_1' });
+  });
+
+  it('handles user not found on get user', async () => {
+    const service = await import('./service.js');
+    vi.mocked(service.getUser).mockRejectedValueOnce(
+      new service.UserManagementError('Utilisateur introuvable.', 404),
+    );
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'GET',
+      url: '/admin/users/unknown',
+      headers: { authorization: `Bearer ${token(['user.manage'])}` },
+    });
+    expect(response.statusCode).toBe(404);
+  });
+
+  it('rejects update with invalid payload', async () => {
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/admin/users/user_1',
+      headers: { authorization: `Bearer ${token(['user.manage'])}` },
+      payload: { roleIds: 'not-an-array' },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it('handles service errors on update', async () => {
+    const service = await import('./service.js');
+    vi.mocked(service.updateUser).mockRejectedValueOnce(
+      new service.UserManagementError(
+        'Le dernier administrateur actif ne peut pas être retiré.',
+        409,
+      ),
+    );
+    const app = await buildApp();
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/admin/users/user_1',
+      headers: { authorization: `Bearer ${token(['user.manage'])}` },
+      payload: { isActive: false },
+    });
+    expect(response.statusCode).toBe(409);
+  });
 });

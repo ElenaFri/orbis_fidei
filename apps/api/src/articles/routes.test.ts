@@ -159,6 +159,21 @@ describe('article routes', () => {
     expect(response.statusCode).toBe(400);
   });
 
+  it('refuse une création sans sourceId', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/admin/articles',
+      headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
+      payload: {
+        slug: 'mon-article',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
   it("rejette la modification avec 403 sans la permission 'article.edit'", async () => {
     const app = await buildTestApp();
     const createAuth = { authorization: `Bearer ${await tokenWith(['article.create'])}` };

@@ -156,4 +156,16 @@ describe('public article routes', () => {
     const response = await app.inject({ method: 'GET', url: '/articles/unknown?lang=FR' });
     expect(response.statusCode).toBe(404);
   });
+
+  it('rejects an invalid page query parameter', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({ method: 'GET', url: '/articles?page=0' });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it('rejects an invalid language in detail query', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({ method: 'GET', url: '/articles/mon-article?lang=INVALID' });
+    expect(response.statusCode).toBe(400);
+  });
 });
