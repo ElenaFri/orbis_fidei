@@ -23,6 +23,9 @@ const auth = useAuthStore();
       <RouterLink v-if="auth.hasPermission('article.create')" :to="{ name: 'admin-articles' }">
         {{ t('admin.articles') }}
       </RouterLink>
+      <RouterLink v-if="auth.hasPermission('user.manage')" :to="{ name: 'admin-users' }">
+        {{ t('admin.users') }}
+      </RouterLink>
     </aside>
 
     <section class="admin-content">

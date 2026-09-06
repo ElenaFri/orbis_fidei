@@ -7,6 +7,8 @@ import type {
   PublicArticleListItem,
   PublicComment,
   AdminProposal,
+  AdminRole,
+  AdminUser,
 } from '@orbis-fidei/types';
 import type {
   ArticleCreateInput,
@@ -167,5 +169,12 @@ export const api = {
       request<AdminArticle>(`/admin/suggestions/${id}/accept`, { method: 'POST' }),
     reject: (id: string) =>
       request<AdminProposal>(`/admin/suggestions/${id}/reject`, { method: 'POST' }),
+  },
+
+  users: {
+    list: () => request<AdminUser[]>('/admin/users'),
+    roles: () => request<AdminRole[]>('/admin/roles'),
+    update: (id: string, input: { roleIds?: string[]; isActive?: boolean }) =>
+      request<AdminUser>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
   },
 };

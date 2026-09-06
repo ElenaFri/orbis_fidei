@@ -60,6 +60,9 @@ async function onLogout() {
       <p class="dropdown-name">
         {{ auth.user?.displayName }}
       </p>
+      <p class="dropdown-role">
+        {{ auth.user?.roles?.join(', ') || t('nav.member') }}
+      </p>
       <button type="button" class="dropdown-action" role="menuitem" @click="onLogout">
         {{ t('nav.logout') }}
       </button>
@@ -106,6 +109,13 @@ async function onLogout() {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text, #111827);
+}
+
+.dropdown-role {
+  margin: -0.25rem 0 0.5rem;
+  padding: 0 0.25rem;
+  color: var(--color-muted, #6b7280);
+  font-size: 0.75rem;
 }
 
 .dropdown-action {

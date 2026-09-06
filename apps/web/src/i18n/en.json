@@ -4,7 +4,8 @@
     "search": "Search",
     "login": "Login",
     "logout": "Logout",
-    "admin": "Admin"
+    "admin": "Admin",
+    "member": "Member"
   },
   "home": {
     "title": "Orbis Fidei",
@@ -51,6 +52,7 @@
   },
   "admin": {
     "suggestions": "Suggestions",
+    "users": "Users",
     "sources": "Sources",
     "categories": "Categories",
     "articles": "Articles",
@@ -80,6 +82,13 @@
     "confidence": "Confidence",
     "openSource": "Open source",
     "accept": "Accept",
-    "reject": "Reject"
+    "reject": "Reject",
+    "email": "Email",
+    "roles": "Roles",
+    "active": "Active",
+    "inactive": "Inactive",
+    "enable": "Enable",
+    "disable": "Disable",
+    "noUsers": "No users yet."
   }
 }

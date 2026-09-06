@@ -16,12 +16,15 @@ export class AuthError extends Error {
 
 const DEFAULT_ROLE_NAME = 'REGISTERED_USER';
 
-async function loadPermissions(userId: string): Promise<string[]> {
+async function loadAuthorization(
+  userId: string,
+): Promise<{ permissions: string[]; roles: string[] }> {
   const roles = await prisma.userRole.findMany({
     where: { userId },
     select: {
       role: {
         select: {
+          name: true,
           permissions: { select: { permission: { select: { key: true } } } },
         },
       },
@@ -29,12 +32,14 @@ async function loadPermissions(userId: string): Promise<string[]> {
   });
 
   const keys = new Set<string>();
+  const roleNames = new Set<string>();
   for (const { role } of roles) {
+    roleNames.add(role.name);
     for (const { permission } of role.permissions) {
       keys.add(permission.key);
     }
   }
-  return [...keys];
+  return { permissions: [...keys], roles: [...roleNames] };
 }
 
 export interface AuthResult {
@@ -46,6 +51,7 @@ export interface AuthResult {
     displayName: string;
     preferredLang: string;
     permissions: string[];
+    roles: string[];
   };
 }
 
@@ -76,7 +82,8 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
     },
   });
 
-  const permissions = await loadPermissions(user.id);
+  const authorization = await loadAuthorization(user.id);
+  const permissions = authorization.permissions;
   const accessToken = signAccessToken({ sub: user.id, email: user.email, permissions });
   const refreshToken = signRefreshToken({ sub: user.id, tokenVersion: user.tokenVersion });
 
@@ -89,6 +96,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
       displayName: user.displayName,
       preferredLang: user.preferredLang,
       permissions,
+      roles: authorization.roles,
     },
   };
 }
@@ -104,7 +112,8 @@ export async function login(email: string, password: string): Promise<AuthResult
     throw new AuthError('Identifiants invalides.');
   }
 
-  const permissions = await loadPermissions(user.id);
+  const authorization = await loadAuthorization(user.id);
+  const permissions = authorization.permissions;
   const accessToken = signAccessToken({ sub: user.id, email: user.email, permissions });
   const refreshToken = signRefreshToken({ sub: user.id, tokenVersion: user.tokenVersion });
 
@@ -117,6 +126,7 @@ export async function login(email: string, password: string): Promise<AuthResult
       displayName: user.displayName,
       preferredLang: user.preferredLang,
       permissions,
+      roles: authorization.roles,
     },
   };
 }
@@ -134,7 +144,8 @@ export async function refresh(refreshToken: string): Promise<AuthResult> {
     throw new AuthError('Refresh token révoqué.');
   }
 
-  const permissions = await loadPermissions(user.id);
+  const authorization = await loadAuthorization(user.id);
+  const permissions = authorization.permissions;
   const accessToken = signAccessToken({ sub: user.id, email: user.email, permissions });
   const newRefreshToken = signRefreshToken({ sub: user.id, tokenVersion: user.tokenVersion });
 
@@ -147,6 +158,7 @@ export async function refresh(refreshToken: string): Promise<AuthResult> {
       displayName: user.displayName,
       preferredLang: user.preferredLang,
       permissions,
+      roles: authorization.roles,
     },
   };
 }
@@ -163,13 +175,15 @@ export async function getMe(userId: string): Promise<AuthResult['user'] | null> 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user?.isActive) return null;
 
-  const permissions = await loadPermissions(user.id);
+  const authorization = await loadAuthorization(user.id);
+  const permissions = authorization.permissions;
   return {
     id: user.id,
     email: user.email,
     displayName: user.displayName,
     preferredLang: user.preferredLang,
     permissions,
+    roles: authorization.roles,
   };
 }
 

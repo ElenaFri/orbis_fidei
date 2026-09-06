@@ -25,6 +25,7 @@ export interface AuthenticatedUser {
   displayName: string;
   preferredLang: Language;
   permissions: string[];
+  roles?: string[];
 }
 
 export type SourceType = 'RSS' | 'ATOM' | 'API' | 'OTHER';
@@ -115,4 +116,22 @@ export interface AdminProposal {
     originalLanguage: Language;
     source: { name: string; url: string };
   };
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  displayName: string;
+  preferredLang: Language;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  roles: { role: { id: string; name: string } }[];
+}
+
+export interface AdminRole {
+  id: string;
+  name: string;
+  description: string | null;
+  permissions: { permission: { key: string } }[];
 }

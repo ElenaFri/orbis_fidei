@@ -4,7 +4,8 @@
     "search": "Поиск",
     "login": "Вход",
     "logout": "Выйти",
-    "admin": "Администрирование"
+    "admin": "Администрирование",
+    "member": "Участник"
   },
   "home": {
     "title": "Orbis Fidei",
@@ -51,6 +52,7 @@
   },
   "admin": {
     "suggestions": "Предложения",
+    "users": "Пользователи",
     "sources": "Источники",
     "categories": "Категории",
     "articles": "Статьи",
@@ -80,6 +82,13 @@
     "confidence": "Уверенность",
     "openSource": "Открыть источник",
     "accept": "Принять",
-    "reject": "Отклонить"
+    "reject": "Отклонить",
+    "email": "Email",
+    "roles": "Роли",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "enable": "Активировать",
+    "disable": "Отключить",
+    "noUsers": "Пользователей пока нет."
   }
 }
