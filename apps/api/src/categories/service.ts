@@ -34,5 +34,12 @@ export async function updateCategory(id: string, input: Partial<CategoryInput>) 
 
 export async function deleteCategory(id: string): Promise<void> {
   await getCategory(id);
+  const articleCount = await prisma.articleCategory.count({ where: { categoryId: id } });
+  if (articleCount > 0) {
+    throw new CategoryError(
+      'Cette catégorie est utilisée par des articles. Renommez-la plutôt que de la supprimer.',
+      409,
+    );
+  }
   await prisma.category.delete({ where: { id } });
 }

@@ -18,6 +18,7 @@ let nextId = 1;
 vi.mock('@orbis-fidei/database', () => ({
   prisma: {
     category: createFakeCrud<FakeCategory>(categories, () => `category_${nextId++}`, 'key'),
+    articleCategory: { count: vi.fn(async () => 0) },
   },
 }));
 
