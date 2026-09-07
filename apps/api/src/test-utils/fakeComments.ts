@@ -15,7 +15,7 @@ export function createFakeCommentPrisma(
   articles: Map<string, { id: string }>,
   comments: Map<string, FakeCommentRecord>,
   nextId: () => string,
-  includeReplies: boolean,
+  _includeReplies = true,
 ) {
   return {
     article: {
@@ -24,15 +24,28 @@ export function createFakeCommentPrisma(
       ),
     },
     comment: {
-      findMany: vi.fn(async ({ where }: { where: { articleId: string; parentId: null } }) =>
-        [...comments.values()]
-          .filter((comment) => comment.articleId === where.articleId && comment.parentId === null)
-          .map((comment) => ({
-            ...comment,
-            replies: includeReplies
-              ? [...comments.values()].filter((reply) => reply.parentId === comment.id)
-              : [],
-          })),
+      findMany: vi.fn(
+        async ({
+          where,
+        }: {
+          where?: {
+            articleId?: string;
+            parentId?: string | null;
+            status?: string;
+          };
+        } = {}) => {
+          let list = [...comments.values()];
+          if (where?.articleId) {
+            list = list.filter((c) => c.articleId === where.articleId);
+          }
+          if (where?.parentId !== undefined) {
+            list = list.filter((c) => c.parentId === where.parentId);
+          }
+          if (where?.status) {
+            list = list.filter((c) => c.status === where.status);
+          }
+          return list;
+        },
       ),
       findUnique: vi.fn(
         async ({ where }: { where: { id: string } }) => comments.get(where.id) ?? null,
@@ -57,6 +70,24 @@ export function createFakeCommentPrisma(
           return comment;
         },
       ),
+      update: vi.fn(
+        async ({ where, data }: { where: { id: string }; data: Partial<FakeCommentRecord> }) => {
+          const comment = comments.get(where.id);
+          if (!comment) throw new Error('not found');
+          Object.assign(comment, data);
+          return comment;
+        },
+      ),
+      delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+        comments.delete(where.id);
+      }),
+      deleteMany: vi.fn(async ({ where }: { where: { parentId: string } }) => {
+        for (const [id, c] of comments.entries()) {
+          if (c.parentId === where.parentId) {
+            comments.delete(id);
+          }
+        }
+      }),
     },
   };
 }

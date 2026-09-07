@@ -171,6 +171,12 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ content, parentId }),
       }),
+    update: (id: string, content: string) =>
+      request<PublicComment>(`/comments/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ content }),
+      }),
+    remove: (id: string) => request<void>(`/comments/${id}`, { method: 'DELETE' }),
   },
 
   proposals: {

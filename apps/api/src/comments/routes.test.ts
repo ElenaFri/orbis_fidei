@@ -29,8 +29,8 @@ async function buildTestApp() {
   return app;
 }
 
-function token(): string {
-  return signAccessToken({ sub: 'user_1', email: 'a@b.com', permissions: [] });
+function token(userId = 'user_1', permissions: string[] = []): string {
+  return signAccessToken({ sub: userId, email: `${userId}@b.com`, permissions });
 }
 
 describe('comment routes', () => {
@@ -92,5 +92,121 @@ describe('comment routes', () => {
       payload: { content: 'Bel article.' },
     });
     expect(response.statusCode).toBe(404);
+  });
+
+  it('rejects updating comment without authentication', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/comments/comment_1',
+      payload: { content: 'Modifié.' },
+    });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('rejects updating with invalid body', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/comments/comment_1',
+      headers: { authorization: `Bearer ${token()}` },
+      payload: { content: '' },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it('updates a comment when author', async () => {
+    comments.set('comment_1', {
+      id: 'comment_1',
+      articleId: 'article_1',
+      authorId: 'user_1',
+      parentId: null,
+      content: 'Original',
+      status: 'PUBLISHED',
+      createdAt: new Date(),
+      author: { displayName: 'Jane Doe' },
+    });
+
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/comments/comment_1',
+      headers: { authorization: `Bearer ${token('user_1')}` },
+      payload: { content: 'Modifié.' },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().content).toBe('Modifié.');
+  });
+
+  it('rejects deleting comment without authentication', async () => {
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'DELETE',
+      url: '/comments/comment_1',
+    });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('deletes a comment when author', async () => {
+    comments.set('comment_1', {
+      id: 'comment_1',
+      articleId: 'article_1',
+      authorId: 'user_1',
+      parentId: null,
+      content: 'À supprimer',
+      status: 'PUBLISHED',
+      createdAt: new Date(),
+      author: { displayName: 'Jane Doe' },
+    });
+
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'DELETE',
+      url: '/comments/comment_1',
+      headers: { authorization: `Bearer ${token('user_1')}` },
+    });
+    expect(response.statusCode).toBe(204);
+  });
+
+  it('deletes a comment when moderator', async () => {
+    comments.set('comment_1', {
+      id: 'comment_1',
+      articleId: 'article_1',
+      authorId: 'user_1',
+      parentId: null,
+      content: 'À modérer',
+      status: 'PUBLISHED',
+      createdAt: new Date(),
+      author: { displayName: 'Jane Doe' },
+    });
+
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'DELETE',
+      url: '/comments/comment_1',
+      headers: { authorization: `Bearer ${token('moderator_user', ['comment.moderate'])}` },
+    });
+    expect(response.statusCode).toBe(204);
+  });
+
+  it('rejects deletion when neither author nor moderator', async () => {
+    comments.set('comment_1', {
+      id: 'comment_1',
+      articleId: 'article_1',
+      authorId: 'user_1',
+      parentId: null,
+      content: 'Commentaire',
+      status: 'PUBLISHED',
+      createdAt: new Date(),
+      author: { displayName: 'Jane Doe' },
+    });
+
+    const app = await buildTestApp();
+    const response = await app.inject({
+      method: 'DELETE',
+      url: '/comments/comment_1',
+      headers: { authorization: `Bearer ${token('user_2')}` },
+    });
+    expect(response.statusCode).toBe(403);
   });
 });

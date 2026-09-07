@@ -4,6 +4,7 @@ import {
   LoginSchema,
   RegisterSchema,
   CommentInputSchema,
+  CommentUpdateInputSchema,
   SourceInputSchema,
   CategoryInputSchema,
   ArticleCreateInputSchema,
@@ -53,6 +54,18 @@ describe('CommentInputSchema', () => {
 
   it('accepte un commentaire simple', () => {
     const result = CommentInputSchema.safeParse({ content: 'Bel article.' });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('CommentUpdateInputSchema', () => {
+  it('refuse une modification avec contenu vide', () => {
+    const result = CommentUpdateInputSchema.safeParse({ content: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepte une modification valide', () => {
+    const result = CommentUpdateInputSchema.safeParse({ content: 'Commentaire corrigé.' });
     expect(result.success).toBe(true);
   });
 });

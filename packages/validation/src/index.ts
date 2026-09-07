@@ -23,6 +23,11 @@ export const CommentInputSchema = z.object({
 });
 export type CommentInput = z.infer<typeof CommentInputSchema>;
 
+export const CommentUpdateInputSchema = z.object({
+  content: z.string().min(1).max(4000),
+});
+export type CommentUpdateInput = z.infer<typeof CommentUpdateInputSchema>;
+
 export const ArticleTranslationInputSchema = z.object({
   language: LanguageSchema,
   title: z.string().min(3).max(300),

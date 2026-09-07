@@ -386,4 +386,33 @@ describe('api client', () => {
       }),
     );
   });
+
+  it('comments.update() envoie la modification du commentaire', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ id: 'comment_1', content: 'Modifié' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.comments.update('comment_1', 'Modifié');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/comments/comment_1'),
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ content: 'Modifié' }),
+      }),
+    );
+  });
+
+  it('comments.remove() envoie la suppression du commentaire', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.comments.remove('comment_1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/comments/comment_1'),
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
 });

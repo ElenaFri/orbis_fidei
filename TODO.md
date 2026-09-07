@@ -109,8 +109,8 @@ Objectif : API Fastify qui démarre, expose `/health`, structure par domaine.
   - [x] `PATCH /admin/articles/:id` édition (traductions + catégories)
   - [x] `POST /admin/articles/:id/publish` transition minimale vers `PUBLISHED`
 - [x] Propositions : `GET /admin/suggestions`, `POST /admin/suggestions/:id/accept|reject`
-- [~] Commentaires : `GET /articles/:id/comments`, `POST /articles/:id/comments` ; signalement prévu ultérieurement
-- [ ] Modération commentaires : `PATCH /admin/comments/:id` (`hide`, `delete`)
+- [x] Commentaires : `GET /articles/:id/comments`, `POST /articles/:id/comments`, `PATCH /comments/:id`, `DELETE /comments/:id` (auteur & modération `comment.moderate`)
+- [ ] Modération commentaires avancée : signalement (`POST /comments/:id/report`) & masquage (`hide`)
 
 ### 2.4 Historique éditorial
 
@@ -148,18 +148,19 @@ Objectif : SPA Vue qui démarre, deux espaces (public + admin), i18n FR/EN/RU.
 - [x] Garde de route : redirection si non authentifié / non autorisé (`router/guards.ts`)
 - [x] Layout admin (sidebar filtrée par permissions)
 - [x] `/admin/suggestions` : file des propositions avec acceptation/rejet
-- [x] `/admin/articles` : liste + création (édition multi-langue à approfondir)
+- [x] `/admin/articles` : liste + création + détail & édition ciblée
 - [ ] `/admin/translations` : traductions à relire
-- [ ] `/admin/comments` : modération
+- [ ] `/admin/comments` : modération avancée (signalements)
 - [x] `/admin/sources` : CRUD sources
-- [x] `/admin/categories` : CRUD catégories
-- [ ] `/admin/users` : gestion utilisateurs / rôles
+- [x] `/admin/categories` : CRUD catégories avec garde de suppression & édition
+- [x] `/admin/users` : gestion utilisateurs & rôles avec protection dernier admin
 
 ### 3.4 Commentaires
 
-- [x] Composant `CommentThread` (imbrication)
-- [~] Formulaire de commentaire top-level ; réponse imbriquée à approfondir
-- [ ] Signalement + modification / suppression de ses propres commentaires
+- [x] Composant `CommentThread` (imbrication & dépliage > 3 commentaires/réponses)
+- [x] Formulaire de réponse imbriquée (`parentId`)
+- [x] Modification / suppression de ses propres commentaires & suppression par modérateur/admin (`comment.moderate`)
+- [ ] Signalement de commentaire (`report`)
 
 ---
 
