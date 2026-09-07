@@ -32,7 +32,9 @@ function withRelations(article: FakeArticle, lang: string) {
   return {
     ...article,
     translations: translations.filter((t) => t.articleId === article.id && t.language === lang),
-    categories: [] as { category: { key: string } }[],
+    categories: [] as {
+      category: { id: string; key: string; labelFr: string; labelEn: string; labelRu: string };
+    }[],
     source: { name: 'Vatican News', url: 'https://vaticannews.va/fr.rss.xml' },
     proposal: {
       sourceItem: {

@@ -26,6 +26,13 @@ function toSummary(
     publishedAt: article.publishedAt,
     sourceName: article.source?.name,
     categoryKeys: article.categories.map((c) => c.category.key),
+    categories: article.categories.map((c) => ({
+      id: c.category.id,
+      key: c.category.key,
+      labelFr: c.category.labelFr,
+      labelEn: c.category.labelEn,
+      labelRu: c.category.labelRu,
+    })),
     commentCount: article._count.comments,
   };
 }

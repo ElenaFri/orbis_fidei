@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { PublicArticleListItem } from '@orbis-fidei/types';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+
+import { formatCategoryLabel } from '@/utils/category';
 
 const props = defineProps<{
   article: PublicArticleListItem;
@@ -8,7 +11,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{ toggle: [] }>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
+const categoriesList = computed(() => {
+  if (props.article.categories && props.article.categories.length > 0) {
+    return props.article.categories.map((cat) => formatCategoryLabel(cat, locale.value));
+  }
+  return props.article.categoryKeys || [];
+});
 </script>
 
 <template>
@@ -28,6 +38,11 @@ const { t } = useI18n();
     </button>
 
     <div v-if="props.expanded" class="article-expanded">
+      <div v-if="categoriesList.length > 0" class="category-badges">
+        <span v-for="catLabel in categoriesList" :key="catLabel" class="category-badge">
+          {{ catLabel }}
+        </span>
+      </div>
       <p class="article-summary-text">{{ props.article.summary }}</p>
       <RouterLink class="article-link" :to="`/a/${props.article.slug}`">
         {{ t('articles.readMore') }}
@@ -80,6 +95,24 @@ const { t } = useI18n();
 
 .article-expanded {
   padding: 0 0 1rem;
+}
+
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.category-badge {
+  background: var(--color-bg-muted, #f3f4f6);
+  color: var(--color-accent, #1e40af);
+  border: 1px solid var(--color-border, #e5e7eb);
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .article-summary-text {

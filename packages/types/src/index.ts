@@ -2,6 +2,14 @@ export type Language = 'FR' | 'EN' | 'RU';
 
 export const SUPPORTED_LANGUAGES: readonly Language[] = ['FR', 'EN', 'RU'] as const;
 
+export interface ArticleCategorySummary {
+  id: string;
+  key: string;
+  labelFr: string;
+  labelEn: string;
+  labelRu: string;
+}
+
 export interface ArticleSummary {
   id: string;
   slug: string;
@@ -11,6 +19,7 @@ export interface ArticleSummary {
   publishedAt: string | null;
   sourceName?: string;
   categoryKeys: string[];
+  categories?: ArticleCategorySummary[];
   commentCount: number;
 }
 

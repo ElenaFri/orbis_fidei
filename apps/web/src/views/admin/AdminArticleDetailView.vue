@@ -1,18 +1,42 @@
 <script setup lang="ts">
-import type { AdminArticle } from '@orbis-fidei/types';
+import type { AdminArticle, AdminCategory } from '@orbis-fidei/types';
+import { slugify } from '@orbis-fidei/validation';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink, useRoute } from 'vue-router';
 
 import { ApiError, api } from '@/services/api';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const article = ref<AdminArticle | null>(null);
+const categories = ref<AdminCategory[]>([]);
 const error = ref<string | null>(null);
-const editingField = ref<'slug' | 'title' | 'summary' | 'analysis' | null>(null);
+const editingField = ref<'slug' | 'title' | 'summary' | 'analysis' | 'categories' | null>(null);
 const isSaving = ref(false);
-const form = reactive({ slug: '', title: '', summary: '', analysis: '' });
+const isAddingCategory = ref(false);
+const isCategorySubmitting = ref(false);
+
+const form = reactive({
+  slug: '',
+  title: '',
+  summary: '',
+  analysis: '',
+  categoryIds: [] as string[],
+});
+
+const categoryForm = reactive({
+  key: '',
+  labelFr: '',
+  labelEn: '',
+  labelRu: '',
+});
+
+function onCategoryLabelFrInput() {
+  if (categoryForm.labelFr) {
+    categoryForm.key = slugify(categoryForm.labelFr);
+  }
+}
 
 const originalTranslation = computed(() => {
   if (!article.value) return undefined;
@@ -26,6 +50,18 @@ const sourceUrl = computed(() => {
   return article.value?.proposal?.sourceItem?.originalUrl ?? article.value?.source?.url;
 });
 
+function getCategoryLabel(cat: AdminCategory): string {
+  if (locale.value === 'ru') return cat.labelRu || cat.labelFr || cat.key;
+  if (locale.value === 'en') return cat.labelEn || cat.labelFr || cat.key;
+  return cat.labelFr || cat.key;
+}
+
+const articleCategories = computed(() => {
+  if (!article.value) return [];
+  const assignedIds = new Set(article.value.categories.map((c) => c.categoryId));
+  return categories.value.filter((cat) => assignedIds.has(cat.id));
+});
+
 function statusLabel(status: string): string {
   const key = `articleStatuses.${status}`;
   const translated = t(key);
@@ -34,9 +70,16 @@ function statusLabel(status: string): string {
 
 async function loadArticle() {
   try {
-    article.value = await api.articles.get(String(route.params.id));
+    const [fetchedArticle, fetchedCategories] = await Promise.all([
+      api.articles.get(String(route.params.id)),
+      api.categories.list(),
+    ]);
+    article.value = fetchedArticle;
+    categories.value = fetchedCategories;
+
     if (article.value) {
       form.slug = article.value.slug;
+      form.categoryIds = article.value.categories.map((c) => c.categoryId);
     }
     const translation = originalTranslation.value;
     if (translation) {
@@ -49,20 +92,48 @@ async function loadArticle() {
   }
 }
 
-function startEdit(field: 'slug' | 'title' | 'summary' | 'analysis') {
+function startEdit(field: 'slug' | 'title' | 'summary' | 'analysis' | 'categories') {
   editingField.value = field;
+  if (field === 'categories' && article.value) {
+    form.categoryIds = article.value.categories.map((c) => c.categoryId);
+  }
 }
 
 function cancelEdit() {
   editingField.value = null;
+  isAddingCategory.value = false;
   if (article.value) {
     form.slug = article.value.slug;
+    form.categoryIds = article.value.categories.map((c) => c.categoryId);
   }
   const translation = originalTranslation.value;
   if (translation) {
     form.title = translation.title;
     form.summary = translation.summary;
     form.analysis = translation.analysis;
+  }
+}
+
+async function onCreateCategory() {
+  error.value = null;
+  isCategorySubmitting.value = true;
+  try {
+    const newCat = await api.categories.create({
+      ...categoryForm,
+    });
+    categories.value.push(newCat);
+    if (!form.categoryIds.includes(newCat.id)) {
+      form.categoryIds.push(newCat.id);
+    }
+    categoryForm.key = '';
+    categoryForm.labelFr = '';
+    categoryForm.labelEn = '';
+    categoryForm.labelRu = '';
+    isAddingCategory.value = false;
+  } catch (err) {
+    error.value = err instanceof ApiError ? err.message : t('admin.error');
+  } finally {
+    isCategorySubmitting.value = false;
   }
 }
 
@@ -74,6 +145,10 @@ async function saveField() {
     if (editingField.value === 'slug') {
       await api.articles.update(article.value.id, {
         slug: form.slug,
+      });
+    } else if (editingField.value === 'categories') {
+      await api.articles.update(article.value.id, {
+        categoryIds: form.categoryIds,
       });
     } else if (originalTranslation.value) {
       await api.articles.update(article.value.id, {
@@ -210,6 +285,62 @@ onMounted(loadArticle);
         <p v-else>{{ form.analysis }}</p>
       </section>
 
+      <section class="editable-section" @click="startEdit('categories')">
+        <h2>{{ t('admin.categories') }}</h2>
+        <div v-if="editingField === 'categories'" @click.stop>
+          <div class="checkbox-group">
+            <label v-for="cat in categories" :key="cat.id" class="checkbox-label">
+              <input
+                v-model="form.categoryIds"
+                type="checkbox"
+                :value="cat.id"
+                class="checkbox-input"
+              />
+              <span class="checkbox-text">{{ getCategoryLabel(cat) }}</span>
+            </label>
+            <span v-if="categories.length === 0" class="muted">{{ t('admin.noCategories') }}</span>
+          </div>
+          <button
+            type="button"
+            class="secondary-button"
+            @click="isAddingCategory = !isAddingCategory"
+          >
+            {{ t('admin.addCategory') }}
+          </button>
+
+          <div v-if="isAddingCategory" class="nested-form">
+            <label for="detail-cat-fr">{{ t('admin.labelFr') }}</label>
+            <input
+              id="detail-cat-fr"
+              v-model="categoryForm.labelFr"
+              required
+              @input="onCategoryLabelFrInput"
+            />
+
+            <label for="detail-cat-en">{{ t('admin.labelEn') }}</label>
+            <input id="detail-cat-en" v-model="categoryForm.labelEn" required />
+
+            <label for="detail-cat-ru">{{ t('admin.labelRu') }}</label>
+            <input id="detail-cat-ru" v-model="categoryForm.labelRu" required />
+
+            <label for="detail-cat-key">{{ t('admin.key') }}</label>
+            <input id="detail-cat-key" v-model="categoryForm.key" required />
+
+            <button type="button" :disabled="isCategorySubmitting" @click="onCreateCategory">
+              {{ t('admin.saveCategory') }}
+            </button>
+          </div>
+        </div>
+        <div v-else class="tags-list">
+          <span v-for="cat in articleCategories" :key="cat.id" class="category-tag">
+            {{ getCategoryLabel(cat) }}
+          </span>
+          <span v-if="articleCategories.length === 0" class="muted">{{
+            t('admin.noCategories')
+          }}</span>
+        </div>
+      </section>
+
       <div v-if="editingField" class="detail-actions">
         <button type="button" :disabled="isSaving" @click="saveField">{{ t('admin.save') }}</button>
         <button type="button" :disabled="isSaving" @click="cancelEdit">
@@ -288,5 +419,84 @@ onMounted(loadArticle);
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 6px;
+  background: var(--color-bg, #ffffff);
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin: 0;
+  font-weight: normal;
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+  align-self: stretch;
+}
+.checkbox-input {
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+}
+.checkbox-text {
+  user-select: none;
+  text-align: left;
+}
+.nested-form {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-bg-muted, #f9fafb);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.nested-form label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.nested-form input {
+  padding: 0.4rem;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 4px;
+}
+.secondary-button {
+  background: #4b5563;
+  color: white;
+  padding: 0.35rem 0.7rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.category-tag {
+  background: var(--color-bg-muted, #e5e7eb);
+  color: var(--color-text, #374151);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 </style>
