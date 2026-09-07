@@ -44,7 +44,18 @@ export async function createArticle(input: ArticleCreateInput, authorId: string)
 }
 
 export async function updateArticle(id: string, input: ArticleUpdateInput) {
-  await getArticle(id);
+  const current = await getArticle(id);
+
+  if (input.slug && input.slug !== current.slug) {
+    const existing = await prisma.article.findUnique({ where: { slug: input.slug } });
+    if (existing && existing.id !== id) {
+      throw new ArticleError('Un article avec ce slug existe déjà.', 409);
+    }
+    await prisma.article.update({
+      where: { id },
+      data: { slug: input.slug },
+    });
+  }
 
   if (input.translations) {
     for (const translation of input.translations) {

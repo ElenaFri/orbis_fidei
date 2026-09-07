@@ -10,9 +10,9 @@ const { t } = useI18n();
 const route = useRoute();
 const article = ref<AdminArticle | null>(null);
 const error = ref<string | null>(null);
-const editingField = ref<'title' | 'summary' | 'analysis' | null>(null);
+const editingField = ref<'slug' | 'title' | 'summary' | 'analysis' | null>(null);
 const isSaving = ref(false);
-const form = reactive({ title: '', summary: '', analysis: '' });
+const form = reactive({ slug: '', title: '', summary: '', analysis: '' });
 
 const originalTranslation = computed(() => {
   if (!article.value) return undefined;
@@ -31,6 +31,9 @@ function statusLabel(status: string): string {
 async function loadArticle() {
   try {
     article.value = await api.articles.get(String(route.params.id));
+    if (article.value) {
+      form.slug = article.value.slug;
+    }
     const translation = originalTranslation.value;
     if (translation) {
       form.title = translation.title;
@@ -42,12 +45,15 @@ async function loadArticle() {
   }
 }
 
-function startEdit(field: 'title' | 'summary' | 'analysis') {
+function startEdit(field: 'slug' | 'title' | 'summary' | 'analysis') {
   editingField.value = field;
 }
 
 function cancelEdit() {
   editingField.value = null;
+  if (article.value) {
+    form.slug = article.value.slug;
+  }
   const translation = originalTranslation.value;
   if (translation) {
     form.title = translation.title;
@@ -57,20 +63,26 @@ function cancelEdit() {
 }
 
 async function saveField() {
-  if (!article.value || !originalTranslation.value || !editingField.value) return;
+  if (!article.value || !editingField.value) return;
   isSaving.value = true;
   error.value = null;
   try {
-    await api.articles.update(article.value.id, {
-      translations: [
-        {
-          language: originalTranslation.value.language,
-          title: form.title,
-          summary: form.summary,
-          analysis: form.analysis,
-        },
-      ],
-    });
+    if (editingField.value === 'slug') {
+      await api.articles.update(article.value.id, {
+        slug: form.slug,
+      });
+    } else if (originalTranslation.value) {
+      await api.articles.update(article.value.id, {
+        translations: [
+          {
+            language: originalTranslation.value.language,
+            title: form.title,
+            summary: form.summary,
+            analysis: form.analysis,
+          },
+        ],
+      });
+    }
     await loadArticle();
     editingField.value = null;
   } catch (err) {
@@ -108,7 +120,7 @@ onMounted(loadArticle);
     <template v-else>
       <header class="detail-header">
         <div>
-          <p class="muted">{{ article.slug }} · {{ article.originalLang }}</p>
+          <p class="muted">{{ article.originalLang }}</p>
           <h1>{{ t('admin.articleDetail') }}</h1>
         </div>
         <span class="status-badge">{{ statusLabel(article.status) }}</span>
@@ -122,6 +134,22 @@ onMounted(loadArticle);
       >
         {{ t('admin.publish') }}
       </button>
+
+      <section class="editable-section" @click="startEdit('slug')">
+        <h2>{{ t('admin.slug') }}</h2>
+        <label v-if="editingField === 'slug'" class="sr-only" for="detail-slug">{{
+          t('admin.slug')
+        }}</label>
+        <input
+          v-if="editingField === 'slug'"
+          id="detail-slug"
+          v-model="form.slug"
+          pattern="[a-z0-9-]+"
+          minlength="3"
+          @click.stop
+        />
+        <p v-else>{{ form.slug }}</p>
+      </section>
 
       <section class="editable-section" @click="startEdit('title')">
         <h2>{{ t('admin.title') }}</h2>

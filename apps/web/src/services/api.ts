@@ -44,7 +44,9 @@ export function setAccessToken(token: string | null): void {
 
 async function rawRequest(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
-  headers.set('Content-Type', 'application/json');
+  if (init.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }

@@ -1,4 +1,5 @@
 import { prisma } from '@orbis-fidei/database';
+import { slugify } from '@orbis-fidei/validation';
 
 export class ProposalError extends Error {
   constructor(
@@ -42,13 +43,16 @@ export async function acceptProposal(id: string, reviewerId: string) {
   const title = proposal.suggestedTitle?.trim() || proposal.sourceItem.originalTitle;
   const summary =
     proposal.suggestedSummary?.trim() || proposal.sourceItem.originalContent.slice(0, 500);
-  const slug = `${proposal.sourceItem.id}-${title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 80)}`;
+  const baseSlug = slugify(title);
 
   return prisma.$transaction(async (transaction) => {
+    let slug = baseSlug;
+    let counter = 1;
+    while (await transaction.article.findUnique({ where: { slug } })) {
+      counter += 1;
+      slug = `${baseSlug}-${counter}`;
+    }
+
     const article = await transaction.article.create({
       data: {
         slug,

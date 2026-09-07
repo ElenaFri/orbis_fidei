@@ -7,6 +7,8 @@ import {
   SourceInputSchema,
   CategoryInputSchema,
   ArticleCreateInputSchema,
+  ArticleUpdateInputSchema,
+  slugify,
 } from './index.js';
 
 describe('LoginSchema', () => {
@@ -146,5 +148,38 @@ describe('ArticleCreateInputSchema', () => {
       ],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('ArticleUpdateInputSchema', () => {
+  it('accepte une mise à jour de slug valide', () => {
+    const result = ArticleUpdateInputSchema.safeParse({
+      slug: 'nouveau-slug-valide',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('refuse un slug avec des caractères invalides en mise à jour', () => {
+    const result = ArticleUpdateInputSchema.safeParse({
+      slug: 'Invalide Slug !',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('slugify', () => {
+  it('supprime les accents et remplace les espaces par des tirets', () => {
+    expect(slugify('Rentrée scolaire à Bukavu malgré la menace d’Ébola')).toBe(
+      'rentree-scolaire-a-bukavu-malgre-la-menace-d-ebola',
+    );
+  });
+
+  it('translitère le cyrillique en caractères latins', () => {
+    expect(slugify('Новости христиан со всего мира')).toBe('novosti-khristian-so-vsego-mira');
+  });
+
+  it('renvoie article si le texte est vide ou composé uniquement de symboles', () => {
+    expect(slugify('')).toBe('article');
+    expect(slugify('??? !!!')).toBe('article');
   });
 });

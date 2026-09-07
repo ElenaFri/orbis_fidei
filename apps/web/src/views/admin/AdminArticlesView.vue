@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AdminArticle, AdminSource } from '@orbis-fidei/types';
+import { slugify } from '@orbis-fidei/validation';
 import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -16,6 +17,7 @@ const isSubmitting = ref(false);
 const statusFilter = ref('ALL');
 const isAddingSource = ref(false);
 const isSourceSubmitting = ref(false);
+const isSlugCustomized = ref(false);
 
 const form = reactive({
   slug: '',
@@ -25,6 +27,16 @@ const form = reactive({
   summary: '',
   analysis: '',
 });
+
+function onTitleInput() {
+  if (!isSlugCustomized.value && form.title) {
+    form.slug = slugify(form.title);
+  }
+}
+
+function onSlugInput() {
+  isSlugCustomized.value = true;
+}
 
 const sourceForm = reactive({
   name: '',
@@ -64,6 +76,7 @@ async function onCreate() {
     form.title = '';
     form.summary = '';
     form.analysis = '';
+    isSlugCustomized.value = false;
     await loadArticles();
   } catch (err) {
     error.value = err instanceof ApiError ? err.message : t('admin.error');
@@ -125,6 +138,7 @@ onMounted(loadArticles);
         minlength="3"
         :title="t('admin.slugHint')"
         required
+        @input="onSlugInput"
       />
       <small class="field-hint">{{ t('admin.slugHint') }}</small>
 
@@ -180,7 +194,7 @@ onMounted(loadArticles);
       </select>
 
       <label for="article-title">{{ t('admin.title') }}</label>
-      <input id="article-title" v-model="form.title" minlength="3" required />
+      <input id="article-title" v-model="form.title" minlength="3" required @input="onTitleInput" />
 
       <label for="article-summary">{{ t('admin.summary') }}</label>
       <textarea id="article-summary" v-model="form.summary" minlength="10" required></textarea>

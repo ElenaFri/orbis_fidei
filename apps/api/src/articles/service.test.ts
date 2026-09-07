@@ -102,13 +102,7 @@ vi.mock('@orbis-fidei/database', () => ({
         return article ? withRelations(article) : null;
       }),
       update: vi.fn(
-        async ({
-          where,
-          data,
-        }: {
-          where: { id: string };
-          data: { status: string; publishedAt: Date };
-        }) => {
+        async ({ where, data }: { where: { id: string }; data: Partial<FakeArticle> }) => {
           const article = articles.get(where.id);
           if (!article) throw new Error('not found');
           Object.assign(article, data);
@@ -286,6 +280,45 @@ describe('articles service', () => {
 
     const updated = await service.updateArticle(created.id, { categoryIds: ['cat_2', 'cat_3'] });
     expect(updated.categories.map((c) => c.categoryId).sort()).toEqual(['cat_2', 'cat_3']);
+  });
+
+  it('met à jour le slug dun article avec succès', async () => {
+    const created = await service.createArticle(
+      {
+        slug: 'mon-article',
+        originalLang: 'FR',
+        categoryIds: [],
+        translations: [baseTranslation],
+      },
+      'user_1',
+    );
+    const updated = await service.updateArticle(created.id, { slug: 'nouveau-slug-valide' });
+    expect(updated.slug).toBe('nouveau-slug-valide');
+  });
+
+  it('refuse de modifier le slug vers un slug déjà existant', async () => {
+    await service.createArticle(
+      {
+        slug: 'premier-article',
+        originalLang: 'FR',
+        categoryIds: [],
+        translations: [baseTranslation],
+      },
+      'user_1',
+    );
+    const second = await service.createArticle(
+      {
+        slug: 'second-article',
+        originalLang: 'FR',
+        categoryIds: [],
+        translations: [baseTranslation],
+      },
+      'user_1',
+    );
+
+    await expect(service.updateArticle(second.id, { slug: 'premier-article' })).rejects.toThrow(
+      service.ArticleError,
+    );
   });
 });
 

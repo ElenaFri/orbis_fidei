@@ -22,7 +22,12 @@ interface FakeProposal {
 }
 
 const proposals = new Map<string, FakeProposal>();
-const articles: Array<{ id: string; status?: string; translations: Array<{ title: string }> }> = [];
+const articles: Array<{
+  id: string;
+  slug?: string;
+  status?: string;
+  translations: Array<{ title: string }>;
+}> = [];
 
 vi.mock('@orbis-fidei/database', () => {
   const prisma = {
@@ -41,15 +46,25 @@ vi.mock('@orbis-fidei/database', () => {
       ),
     },
     article: {
-      create: vi.fn(async ({ data }: { data: { translations: { create: { title: string } } } }) => {
-        const article = {
-          id: `article_${articles.length + 1}`,
-          ...data,
-          translations: [data.translations.create],
-        };
-        articles.push(article);
-        return article;
-      }),
+      findUnique: vi.fn(
+        async ({ where }: { where: { slug?: string } }) =>
+          articles.find((a) => a.slug === where.slug) ?? null,
+      ),
+      create: vi.fn(
+        async ({
+          data,
+        }: {
+          data: { slug: string; translations: { create: { title: string } } };
+        }) => {
+          const article = {
+            id: `article_${articles.length + 1}`,
+            ...data,
+            translations: [data.translations.create],
+          };
+          articles.push(article);
+          return article;
+        },
+      ),
     },
   };
   return {
