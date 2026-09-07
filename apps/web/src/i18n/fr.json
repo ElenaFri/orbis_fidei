@@ -17,7 +17,10 @@
   "home": {
     "title": "Orbis Fidei",
     "tagline": "Chrétienté et spiritualité dans le monde",
-    "empty": "Aucun article publié pour l'instant. Le portail se met en place."
+    "empty": "Aucun article publié pour l'instant. Le portail se met en place.",
+    "categoryFilter": "Catégorie : {category}",
+    "clearFilter": "Effacer",
+    "noCategoryArticles": "Aucun article dans cette catégorie."
   },
   "articles": {
     "loading": "Chargement des articles…",

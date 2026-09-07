@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { PublicArticleListItem } from '@orbis-fidei/types';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import ArticleCard from '@/components/ArticleCard.vue';
 import { ApiError, api } from '@/services/api';
+import { formatCategoryLabel } from '@/utils/category';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const articles = ref<PublicArticleListItem[]>([]);
 const expandedId = ref<string | null>(null);
+const selectedCategory = ref<string | null>(null);
 const error = ref<string | null>(null);
 const isLoading = ref(true);
 
@@ -27,6 +29,29 @@ function toggleArticle(id: string) {
   expandedId.value = expandedId.value === id ? null : id;
 }
 
+const visibleArticles = computed(() => {
+  if (!selectedCategory.value) return articles.value;
+  return articles.value.filter((article) => {
+    const keys = article.categories?.map((category) => category.key) ?? article.categoryKeys;
+    return keys.includes(selectedCategory.value!);
+  });
+});
+
+const selectedCategoryLabel = computed(() => {
+  if (!selectedCategory.value) return '';
+  const article = articles.value.find((item) =>
+    (item.categories?.map((category) => category.key) ?? item.categoryKeys).includes(
+      selectedCategory.value!,
+    ),
+  );
+  const category = article?.categories?.find((item) => item.key === selectedCategory.value);
+  return category ? formatCategoryLabel(category, locale.value) : selectedCategory.value;
+});
+
+function selectCategory(category: string) {
+  selectedCategory.value = selectedCategory.value === category ? null : category;
+}
+
 onMounted(loadArticles);
 </script>
 
@@ -38,12 +63,18 @@ onMounted(loadArticles);
     <p v-else-if="error" class="empty error">{{ error }}</p>
     <p v-else-if="articles.length === 0" class="empty">{{ t('home.empty') }}</p>
     <div v-else class="article-list">
+      <div v-if="selectedCategory" class="active-filter">
+        <span>{{ t('home.categoryFilter', { category: selectedCategoryLabel }) }}</span>
+        <button type="button" @click="selectedCategory = null">{{ t('home.clearFilter') }}</button>
+      </div>
+      <p v-if="visibleArticles.length === 0" class="empty">{{ t('home.noCategoryArticles') }}</p>
       <ArticleCard
-        v-for="article in articles"
+        v-for="article in visibleArticles"
         :key="article.id"
         :article="article"
         :expanded="expandedId === article.id"
         @toggle="toggleArticle(article.id)"
+        @category="selectCategory"
       />
     </div>
   </section>

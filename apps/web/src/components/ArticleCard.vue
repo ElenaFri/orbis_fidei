@@ -10,14 +10,20 @@ const props = defineProps<{
   expanded?: boolean;
 }>();
 
-const emit = defineEmits<{ toggle: [] }>();
+const emit = defineEmits<{
+  toggle: [];
+  category: [key: string];
+}>();
 const { t, locale } = useI18n();
 
-const categoriesList = computed(() => {
+const categoryItems = computed(() => {
   if (props.article.categories && props.article.categories.length > 0) {
-    return props.article.categories.map((cat) => formatCategoryLabel(cat, locale.value));
+    return props.article.categories.map((cat) => ({
+      key: cat.key,
+      label: formatCategoryLabel(cat, locale.value),
+    }));
   }
-  return props.article.categoryKeys || [];
+  return (props.article.categoryKeys || []).map((key) => ({ key, label: key }));
 });
 </script>
 
@@ -38,10 +44,16 @@ const categoriesList = computed(() => {
     </button>
 
     <div v-if="props.expanded" class="article-expanded">
-      <div v-if="categoriesList.length > 0" class="category-badges">
-        <span v-for="catLabel in categoriesList" :key="catLabel" class="category-badge">
-          {{ catLabel }}
-        </span>
+      <div v-if="categoryItems.length > 0" class="category-badges">
+        <button
+          v-for="category in categoryItems"
+          :key="category.key"
+          type="button"
+          class="category-badge"
+          @click.stop="emit('category', category.key)"
+        >
+          {{ category.label }}
+        </button>
       </div>
       <p class="article-summary-text">{{ props.article.summary }}</p>
       <RouterLink class="article-link" :to="`/a/${props.article.slug}`">
@@ -113,6 +125,11 @@ const categoriesList = computed(() => {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
+  cursor: pointer;
+}
+
+.category-badge:hover {
+  background: var(--color-border, #e5e7eb);
 }
 
 .article-summary-text {

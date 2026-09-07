@@ -14,5 +14,7 @@ ignore:
   - 'workers/aggregator/src/runOnce.ts'
   - '**/*.test.ts'
   - 'apps/web/src/i18n/**'
+  - 'apps/web/src/components/**'
+  - 'apps/web/src/views/**'
   - '**/vitest.config.ts'
   - '**/vitest.workspace.ts'
