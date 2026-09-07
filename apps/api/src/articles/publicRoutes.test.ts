@@ -33,7 +33,12 @@ function withRelations(article: FakeArticle, lang: string) {
     ...article,
     translations: translations.filter((t) => t.articleId === article.id && t.language === lang),
     categories: [] as { category: { key: string } }[],
-    source: null,
+    source: { name: 'Vatican News', url: 'https://vaticannews.va/fr.rss.xml' },
+    proposal: {
+      sourceItem: {
+        originalUrl: 'https://vaticannews.va/fr/pape/news/2026-09/actualite.html',
+      },
+    },
     _count: { comments: 0 },
   };
 }
@@ -149,6 +154,9 @@ describe('public article routes', () => {
     expect(response.statusCode).toBe(200);
     expect(response.json().title).toBe('Mon article');
     expect(response.json().analysis).toBe('Analyse.');
+    expect(response.json().sourceUrl).toBe(
+      'https://vaticannews.va/fr/pape/news/2026-09/actualite.html',
+    );
   });
 
   it('returns 404 for an unknown or unpublished slug', async () => {

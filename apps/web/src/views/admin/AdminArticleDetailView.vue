@@ -22,6 +22,10 @@ const originalTranslation = computed(() => {
   );
 });
 
+const sourceUrl = computed(() => {
+  return article.value?.proposal?.sourceItem?.originalUrl ?? article.value?.source?.url;
+});
+
 function statusLabel(status: string): string {
   const key = `articleStatuses.${status}`;
   const translated = t(key);
@@ -120,7 +124,15 @@ onMounted(loadArticle);
     <template v-else>
       <header class="detail-header">
         <div>
-          <p class="muted">{{ article.originalLang }}</p>
+          <p class="muted">
+            {{ article.originalLang }}
+            <template v-if="sourceUrl">
+              ·
+              <a :href="sourceUrl" target="_blank" rel="noopener noreferrer">{{
+                article.source?.name ?? t('admin.source')
+              }}</a>
+            </template>
+          </p>
           <h1>{{ t('admin.articleDetail') }}</h1>
         </div>
         <span class="status-badge">{{ statusLabel(article.status) }}</span>

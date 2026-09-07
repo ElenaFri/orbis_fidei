@@ -14,6 +14,12 @@ export class ArticleError extends Error {
 const ARTICLE_INCLUDE = {
   translations: true,
   categories: { include: { category: true } },
+  source: true,
+  proposal: {
+    include: {
+      sourceItem: true,
+    },
+  },
 } as const;
 
 export function listArticles() {
@@ -129,6 +135,11 @@ export async function getPublicArticleBySlug(slug: string, lang: Language) {
       translations: { where: { language: lang } },
       categories: { include: { category: true } },
       source: true,
+      proposal: {
+        include: {
+          sourceItem: true,
+        },
+      },
       _count: { select: { comments: true } },
     },
   });

@@ -55,10 +55,12 @@ export async function registerPublicArticleRoutes(app: FastifyInstance): Promise
         parsed.data.lang,
       );
       const translation = article.translations[0];
+      const sourceUrl = article.proposal?.sourceItem?.originalUrl ?? article.source?.url;
+
       return {
         ...toSummary(article),
         analysis: translation?.analysis ?? '',
-        sourceUrl: article.source?.url,
+        sourceUrl,
       };
     } catch (error) {
       if (error instanceof articleService.ArticleError) {

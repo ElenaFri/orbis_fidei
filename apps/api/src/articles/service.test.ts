@@ -39,6 +39,7 @@ function withRelations(article: FakeArticle, translationLang?: string) {
         category: { id: c.categoryId },
       })),
     source: null,
+    proposal: null,
     _count: { comments: 0 },
   };
 }

@@ -71,6 +71,7 @@ export interface AdminArticle {
   slug: string;
   status: string;
   sourceId: string | null;
+  proposalId?: string | null;
   originalLang: Language;
   authorId: string | null;
   publishedAt: string | null;
@@ -78,6 +79,12 @@ export interface AdminArticle {
   updatedAt: string;
   translations: AdminArticleTranslation[];
   categories: { articleId: string; categoryId: string }[];
+  source?: AdminSource | null;
+  proposal?: {
+    sourceItem?: {
+      originalUrl?: string;
+    } | null;
+  } | null;
 }
 
 export interface PublicArticleListItem extends ArticleSummary {
