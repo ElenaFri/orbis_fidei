@@ -23,60 +23,76 @@ function clearRefreshCookie(reply: FastifyReply): void {
 }
 
 export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {
-  app.post('/auth/register', async (request, reply) => {
-    const parsed = RegisterSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.code(400).send({ error: 'Requête invalide.', details: parsed.error.flatten() });
-    }
-
-    try {
-      const result = await authService.register(parsed.data);
-      setRefreshCookie(reply, result.refreshToken);
-      return reply.code(201).send({ accessToken: result.accessToken, user: result.user });
-    } catch (error) {
-      if (error instanceof authService.AuthError) {
-        return reply.code(error.statusCode).send({ error: error.message });
+  app.post(
+    '/auth/register',
+    { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
+    async (request, reply) => {
+      const parsed = RegisterSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply
+          .code(400)
+          .send({ error: 'Requête invalide.', details: parsed.error.flatten() });
       }
-      throw error;
-    }
-  });
 
-  app.post('/auth/login', async (request, reply) => {
-    const parsed = LoginSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.code(400).send({ error: 'Requête invalide.', details: parsed.error.flatten() });
-    }
-
-    try {
-      const result = await authService.login(parsed.data.email, parsed.data.password);
-      setRefreshCookie(reply, result.refreshToken);
-      return reply.send({ accessToken: result.accessToken, user: result.user });
-    } catch (error) {
-      if (error instanceof authService.AuthError) {
-        return reply.code(error.statusCode).send({ error: error.message });
+      try {
+        const result = await authService.register(parsed.data);
+        setRefreshCookie(reply, result.refreshToken);
+        return reply.code(201).send({ accessToken: result.accessToken, user: result.user });
+      } catch (error) {
+        if (error instanceof authService.AuthError) {
+          return reply.code(error.statusCode).send({ error: error.message });
+        }
+        throw error;
       }
-      throw error;
-    }
-  });
+    },
+  );
 
-  app.post('/auth/refresh', async (request, reply) => {
-    const token = request.cookies[REFRESH_COOKIE_NAME];
-    if (!token) {
-      return reply.code(401).send({ error: 'Refresh token manquant.' });
-    }
-
-    try {
-      const result = await authService.refresh(token);
-      setRefreshCookie(reply, result.refreshToken);
-      return reply.send({ accessToken: result.accessToken, user: result.user });
-    } catch (error) {
-      clearRefreshCookie(reply);
-      if (error instanceof authService.AuthError) {
-        return reply.code(error.statusCode).send({ error: error.message });
+  app.post(
+    '/auth/login',
+    { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
+    async (request, reply) => {
+      const parsed = LoginSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply
+          .code(400)
+          .send({ error: 'Requête invalide.', details: parsed.error.flatten() });
       }
-      throw error;
-    }
-  });
+
+      try {
+        const result = await authService.login(parsed.data.email, parsed.data.password);
+        setRefreshCookie(reply, result.refreshToken);
+        return reply.send({ accessToken: result.accessToken, user: result.user });
+      } catch (error) {
+        if (error instanceof authService.AuthError) {
+          return reply.code(error.statusCode).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/auth/refresh',
+    { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } },
+    async (request, reply) => {
+      const token = request.cookies[REFRESH_COOKIE_NAME];
+      if (!token) {
+        return reply.code(401).send({ error: 'Refresh token manquant.' });
+      }
+
+      try {
+        const result = await authService.refresh(token);
+        setRefreshCookie(reply, result.refreshToken);
+        return reply.send({ accessToken: result.accessToken, user: result.user });
+      } catch (error) {
+        clearRefreshCookie(reply);
+        if (error instanceof authService.AuthError) {
+          return reply.code(error.statusCode).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
 
   app.post('/auth/logout', async (_request, reply) => {
     clearRefreshCookie(reply);

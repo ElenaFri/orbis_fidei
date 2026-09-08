@@ -215,14 +215,14 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 
 ## Phase 6 — Sécurité
 
-- [ ] Rate-limit global + strict sur `/auth/*`
-- [ ] Helmet + CSP
-- [ ] Cookies `httpOnly`, `secure`, `SameSite=Lax`
-- [ ] Validation Zod stricte à toutes les frontières
-- [ ] Sanitization du HTML des commentaires (allowlist)
-- [ ] Secrets **jamais** exposés au frontend
+- [x] Rate-limit global + limites strictes sur `/auth/register`, `/auth/login`, `/auth/refresh`
+- [~] Helmet actif ; CSP stricte à finaliser avec les besoins de production
+- [x] Cookies refresh `httpOnly`, `secure` en production, `SameSite=Lax`
+- [x] Validation Zod stricte aux principales frontières API
+- [ ] Sanitization du HTML des commentaires (allowlist) — le contenu est encore rendu comme texte
+- [x] Secrets non exposés au frontend ; secrets JWT faibles refusés en production
 - [ ] Audit `pnpm audit` en CI
-- [ ] Journalisation des actions sensibles
+- [ ] Journalisation persistante des actions sensibles (`EditorialAction`)
 
 ---
 
