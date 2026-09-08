@@ -1,6 +1,8 @@
 import { prisma } from '@orbis-fidei/database';
 import type { CommentInput, CommentUpdateInput } from '@orbis-fidei/validation';
 
+import { recordEditorialAction } from '../audit/service.js';
+
 export class CommentError extends Error {
   constructor(
     message: string,
@@ -84,11 +86,20 @@ export async function updateComment(commentId: string, userId: string, input: Co
     throw new CommentError('Action non autorisée.', 403);
   }
 
-  return prisma.comment.update({
-    where: { id: commentId },
-    data: { content: input.content },
-    include: { author: AUTHOR_SELECT },
-  });
+  return prisma.comment
+    .update({
+      where: { id: commentId },
+      data: { content: input.content },
+      include: { author: AUTHOR_SELECT },
+    })
+    .then(async (updated) => {
+      await recordEditorialAction({
+        action: 'COMMENT_UPDATED',
+        userId,
+        metadata: { commentId },
+      });
+      return updated;
+    });
 }
 
 async function deleteCommentAndDescendants(commentId: string): Promise<void> {
@@ -111,4 +122,9 @@ export async function deleteComment(commentId: string, userId: string, canModera
   }
 
   await deleteCommentAndDescendants(commentId);
+  await recordEditorialAction({
+    action: canModerate ? 'COMMENT_MODERATED_DELETED' : 'COMMENT_DELETED',
+    userId,
+    metadata: { commentId },
+  });
 }

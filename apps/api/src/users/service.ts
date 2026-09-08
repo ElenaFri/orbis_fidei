@@ -1,5 +1,7 @@
 import { prisma } from '@orbis-fidei/database';
 
+import { recordEditorialAction } from '../audit/service.js';
+
 export class UserManagementError extends Error {
   constructor(
     message: string,
@@ -91,7 +93,7 @@ export async function updateUser(id: string, input: { roleIds?: string[]; isActi
       });
     }
 
-    return transaction.user.update({
+    const updated = await transaction.user.update({
       where: { id },
       data: {
         ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
@@ -99,5 +101,11 @@ export async function updateUser(id: string, input: { roleIds?: string[]; isActi
       },
       select: USER_SELECT,
     });
+    await recordEditorialAction({
+      action: 'USER_ACCESS_UPDATED',
+      userId: id,
+      metadata: { roleIds, isActive: input.isActive ?? user.isActive },
+    });
+    return updated;
   });
 }

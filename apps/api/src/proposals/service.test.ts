@@ -66,6 +66,7 @@ vi.mock('@orbis-fidei/database', () => {
         },
       ),
     },
+    editorialAction: { create: vi.fn(async () => undefined) },
   };
   return {
     prisma: {

@@ -1,6 +1,8 @@
 import { prisma } from '@orbis-fidei/database';
 import { slugify } from '@orbis-fidei/validation';
 
+import { recordEditorialAction } from '../audit/service.js';
+
 export class ProposalError extends Error {
   constructor(
     message: string,
@@ -76,6 +78,12 @@ export async function acceptProposal(id: string, reviewerId: string) {
       where: { id: proposal.id },
       data: { status: 'ACCEPTED', reviewedById: reviewerId, reviewedAt: new Date() },
     });
+    await recordEditorialAction({
+      action: 'PROPOSAL_ACCEPTED',
+      articleId: article.id,
+      userId: reviewerId,
+      metadata: { proposalId: proposal.id },
+    });
 
     return article;
   });
@@ -87,9 +95,15 @@ export async function rejectProposal(id: string, reviewerId: string) {
     throw new ProposalError('Cette proposition a déjà été traitée.', 409);
   }
 
-  return prisma.articleProposal.update({
+  const rejected = await prisma.articleProposal.update({
     where: { id },
     data: { status: 'REJECTED', reviewedById: reviewerId, reviewedAt: new Date() },
     include: PROPOSAL_INCLUDE,
   });
+  await recordEditorialAction({
+    action: 'PROPOSAL_REJECTED',
+    userId: reviewerId,
+    metadata: { proposalId: id },
+  });
+  return rejected;
 }

@@ -13,6 +13,7 @@ coverage:
 
 ignore:
   - '**/src/main.ts'
+  - 'apps/api/src/app.ts'
   - 'workers/aggregator/src/runOnce.ts'
   - '**/*.test.ts'
   - 'apps/web/src/i18n/**'

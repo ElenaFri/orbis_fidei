@@ -216,13 +216,13 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 ## Phase 6 — Sécurité
 
 - [x] Rate-limit global + limites strictes sur `/auth/register`, `/auth/login`, `/auth/refresh`
-- [~] Helmet actif ; CSP stricte à finaliser avec les besoins de production
+- [x] Helmet actif + CSP explicite (`default-src`, `object-src`, `frame-ancestors`, `connect-src`)
 - [x] Cookies refresh `httpOnly`, `secure` en production, `SameSite=Lax`
 - [x] Validation Zod stricte aux principales frontières API
 - [ ] Sanitization du HTML des commentaires (allowlist) — le contenu est encore rendu comme texte
 - [x] Secrets non exposés au frontend ; secrets JWT faibles refusés en production
-- [ ] Audit `pnpm audit` en CI
-- [ ] Journalisation persistante des actions sensibles (`EditorialAction`)
+- [x] Audit `pnpm audit --audit-level=high` en CI
+- [x] Journalisation persistante des actions sensibles (`EditorialAction`)
 
 ---
 

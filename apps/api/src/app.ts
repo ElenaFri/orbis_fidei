@@ -29,7 +29,23 @@ export async function buildApp(): Promise<FastifyInstance> {
   const app: FastifyInstance = Fastify({ logger: loggerOptions });
 
   await app.register(sensible);
-  await app.register(helmet, { global: true });
+  await app.register(helmet, {
+    global: true,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", ...config.API_CORS_ORIGIN.split(',').map((origin) => origin.trim())],
+        formAction: ["'self'"],
+        upgradeInsecureRequests: config.NODE_ENV === 'production' ? [] : null,
+      },
+    },
+  });
   await app.register(cors, {
     origin: config.API_CORS_ORIGIN.split(',').map((o) => o.trim()),
     credentials: true,

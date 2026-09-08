@@ -59,6 +59,7 @@ vi.mock('@orbis-fidei/database', () => {
       deleteMany: vi.fn(async () => undefined),
       createMany: vi.fn(async () => undefined),
     },
+    editorialAction: { create: vi.fn(async () => undefined) },
   };
   return {
     prisma: {

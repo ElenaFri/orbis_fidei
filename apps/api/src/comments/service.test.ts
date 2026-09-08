@@ -11,7 +11,10 @@ const comments = new Map<string, FakeCommentRecord>();
 let nextId = 1;
 
 vi.mock('@orbis-fidei/database', () => ({
-  prisma: createFakeCommentPrisma(articles, comments, () => `comment_${nextId++}`, true),
+  prisma: {
+    ...createFakeCommentPrisma(articles, comments, () => `comment_${nextId++}`, true),
+    editorialAction: { create: vi.fn(async () => undefined) },
+  },
 }));
 
 const service = await import('./service.js');

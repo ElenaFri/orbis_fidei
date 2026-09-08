@@ -1,6 +1,8 @@
 import { prisma } from '@orbis-fidei/database';
 import type { ArticleCreateInput, ArticleUpdateInput, Language } from '@orbis-fidei/validation';
 
+import { recordEditorialAction } from '../audit/service.js';
+
 export class ArticleError extends Error {
   constructor(
     message: string,
@@ -80,21 +82,26 @@ export async function updateArticle(id: string, input: ArticleUpdateInput) {
     });
   }
 
-  return getArticle(id);
+  const updated = await getArticle(id);
+  await recordEditorialAction({ action: 'ARTICLE_UPDATED', articleId: id });
+  return updated;
 }
 /** Minimal editorial transition: marks the article as published. No full workflow yet (see Phase 2.4/8). */
 export async function publishArticle(id: string) {
   await getArticle(id);
-  return prisma.article.update({
+  const article = await prisma.article.update({
     where: { id },
     data: { status: 'PUBLISHED', publishedAt: new Date() },
     include: ARTICLE_INCLUDE,
   });
+  await recordEditorialAction({ action: 'ARTICLE_PUBLISHED', articleId: id });
+  return article;
 }
 
 export async function deleteArticle(id: string): Promise<void> {
   await getArticle(id);
   await prisma.article.delete({ where: { id } });
+  await recordEditorialAction({ action: 'ARTICLE_DELETED', articleId: id });
 }
 
 const PUBLIC_PAGE_SIZE = 20;

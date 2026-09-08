@@ -18,6 +18,7 @@ export function createFakeCommentPrisma(
   _includeReplies = true,
 ) {
   return {
+    editorialAction: { create: vi.fn(async () => undefined) },
     article: {
       findUnique: vi.fn(
         async ({ where }: { where: { id: string } }) => articles.get(where.id) ?? null,

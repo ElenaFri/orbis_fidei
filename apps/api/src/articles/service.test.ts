@@ -184,6 +184,7 @@ vi.mock('@orbis-fidei/database', () => ({
         articleCategories.push(...data);
       }),
     },
+    editorialAction: { create: vi.fn(async () => undefined) },
   },
 }));
 

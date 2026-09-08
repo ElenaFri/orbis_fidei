@@ -94,6 +94,7 @@ vi.mock('@orbis-fidei/database', () => ({
     },
     articleTranslation: { upsert: vi.fn() },
     articleCategory: { deleteMany: vi.fn(), createMany: vi.fn() },
+    editorialAction: { create: vi.fn(async () => undefined) },
   },
 }));
 
