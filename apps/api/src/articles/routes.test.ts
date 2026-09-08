@@ -2,6 +2,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { buildAdminTestApp, tokenWith } from '../test-utils/testApp.js';
 
+const addTranslationJob = vi.fn(async () => undefined);
+
+vi.mock('@orbis-fidei/queue', () => ({
+  QUEUES: { TRANSLATION: 'translation' },
+  createRedisConnection: vi.fn(() => ({})),
+  createQueue: vi.fn(() => ({ add: addTranslationJob })),
+}));
+
 interface FakeArticle {
   id: string;
   slug: string;
@@ -301,6 +309,7 @@ describe('article routes', () => {
   });
 
   it('publishes an article with the required permission', async () => {
+    addTranslationJob.mockClear();
     const app = await buildTestApp();
     const created = await app.inject({
       method: 'POST',
@@ -322,6 +331,10 @@ describe('article routes', () => {
     });
     expect(response.statusCode).toBe(200);
     expect(response.json().status).toBe('PUBLISHED');
+    expect(addTranslationJob).toHaveBeenCalledWith(
+      'translate-approved',
+      expect.objectContaining({ articleId: id, sourceLang: 'FR' }),
+    );
   });
 
   it('deletes a draft with article.edit permission', async () => {

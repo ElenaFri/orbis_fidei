@@ -1,8 +1,12 @@
 import { ArticleCreateInputSchema, ArticleUpdateInputSchema } from '@orbis-fidei/validation';
 import type { FastifyInstance } from 'fastify';
+import { createQueue, createRedisConnection, QUEUES } from '@orbis-fidei/queue';
 
 import { requirePermission } from '../auth/plugin.js';
+import { config } from '../config.js';
 import * as articleService from './service.js';
+
+const translationQueue = createQueue(QUEUES.TRANSLATION, createRedisConnection(config.REDIS_URL));
 
 export async function registerArticleRoutes(app: FastifyInstance): Promise<void> {
   app.get('/admin/articles', { preHandler: requirePermission('article.read') }, async () =>
@@ -80,7 +84,12 @@ export async function registerArticleRoutes(app: FastifyInstance): Promise<void>
     { preHandler: requirePermission('article.publish') },
     async (request, reply) => {
       try {
-        return await articleService.publishArticle(request.params.id);
+        const article = await articleService.publishArticle(request.params.id);
+        await translationQueue.add('translate-approved', {
+          articleId: article.id,
+          sourceLang: article.originalLang,
+        });
+        return article;
       } catch (error) {
         if (error instanceof articleService.ArticleError) {
           return reply.code(error.statusCode).send({ error: error.message });

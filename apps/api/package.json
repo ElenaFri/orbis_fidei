@@ -20,6 +20,7 @@
     "@node-rs/argon2": "^1.8.3",
     "@orbis-fidei/config": "workspace:*",
     "@orbis-fidei/database": "workspace:*",
+    "@orbis-fidei/queue": "workspace:*",
     "@orbis-fidei/validation": "workspace:*",
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",

@@ -80,6 +80,9 @@ importers:
       '@orbis-fidei/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@orbis-fidei/queue':
+        specifier: workspace:*
+        version: link:../../packages/queue
       '@orbis-fidei/validation':
         specifier: workspace:*
         version: link:../../packages/validation
