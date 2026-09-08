@@ -3,11 +3,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildAdminTestApp, tokenWith } from '../test-utils/testApp.js';
 
 const addTranslationJob = vi.fn(async () => undefined);
+const closeTranslationQueue = vi.fn(async () => undefined);
 
 vi.mock('@orbis-fidei/queue', () => ({
   QUEUES: { TRANSLATION: 'translation' },
   createRedisConnection: vi.fn(() => ({})),
-  createQueue: vi.fn(() => ({ add: addTranslationJob })),
+  createQueue: vi.fn(() => ({ add: addTranslationJob, close: closeTranslationQueue })),
 }));
 
 interface FakeArticle {
@@ -336,6 +337,32 @@ describe('article routes', () => {
       'translate-approved',
       expect.objectContaining({ articleId: id, sourceLang: 'FR' }),
     );
+  });
+
+  it('keeps publication successful when translation enqueue fails', async () => {
+    addTranslationJob.mockRejectedValueOnce(new Error('Redis unavailable'));
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/admin/articles',
+      headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
+      payload: {
+        slug: 'queue-failure',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
+    });
+    const { id } = created.json();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/admin/articles/${id}/publish`,
+      headers: { authorization: `Bearer ${await tokenWith(['article.publish'])}` },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().status).toBe('PUBLISHED');
   });
 
   it('deletes a draft with article.edit permission', async () => {

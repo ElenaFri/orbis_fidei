@@ -9,6 +9,10 @@ import * as articleService from './service.js';
 const translationQueue = createQueue(QUEUES.TRANSLATION, createRedisConnection(config.REDIS_URL));
 
 export async function registerArticleRoutes(app: FastifyInstance): Promise<void> {
+  app.addHook('onClose', async () => {
+    await translationQueue.close();
+  });
+
   app.get('/admin/articles', { preHandler: requirePermission('article.read') }, async () =>
     articleService.listArticles(),
   );
@@ -85,10 +89,17 @@ export async function registerArticleRoutes(app: FastifyInstance): Promise<void>
     async (request, reply) => {
       try {
         const article = await articleService.publishArticle(request.params.id);
-        await translationQueue.add('translate-approved', {
-          articleId: article.id,
-          sourceLang: article.originalLang,
-        });
+        try {
+          await translationQueue.add('translate-approved', {
+            articleId: article.id,
+            sourceLang: article.originalLang,
+          });
+        } catch (queueError) {
+          request.log.error(
+            { articleId: article.id, queueError },
+            'article published but translation job could not be queued',
+          );
+        }
         return article;
       } catch (error) {
         if (error instanceof articleService.ArticleError) {

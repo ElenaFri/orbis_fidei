@@ -40,4 +40,10 @@ describe('recordEditorialAction', () => {
       },
     });
   });
+
+  it('does not fail the business operation when audit persistence fails', async () => {
+    create.mockRejectedValueOnce(new Error('database unavailable'));
+
+    await expect(recordEditorialAction({ action: 'ARTICLE_PUBLISHED' })).resolves.toBeUndefined();
+  });
 });
