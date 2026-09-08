@@ -124,6 +124,13 @@
     "noSuggestions": "Нет предложений, ожидающих проверки.",
     "category": "Категория",
     "confidence": "Уверенность",
+    "importance": "Важность",
+    "importanceLevels": {
+      "HIGH": "Высокая",
+      "MEDIUM": "Средняя",
+      "LOW": "Низкая",
+      "NOT_EVALUATED": "Не оценена"
+    },
     "openSource": "Открыть источник",
     "accept": "Принять",
     "reject": "Отклонить",

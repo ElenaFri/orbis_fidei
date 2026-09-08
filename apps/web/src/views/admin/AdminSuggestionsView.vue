@@ -10,6 +10,11 @@ const proposals = ref<AdminProposal[]>([]);
 const error = ref<string | null>(null);
 const busyId = ref<string | null>(null);
 
+function importanceLabel(level: string | null): string {
+  if (!level) return t('admin.importanceLevels.NOT_EVALUATED');
+  return t(`admin.importanceLevels.${level}`);
+}
+
 async function loadProposals() {
   try {
     proposals.value = await api.proposals.list();
@@ -63,6 +68,15 @@ onMounted(loadProposals);
         <p class="proposal-meta">
           {{ t('admin.category') }}: {{ proposal.suggestedCategory || 'other' }} ·
           {{ t('admin.confidence') }}: {{ proposal.confidence ?? 0 }}
+        </p>
+        <p class="proposal-importance">
+          {{ t('admin.importance') }}: {{ importanceLabel(proposal.importanceLevel) }}
+          <template v-if="proposal.importanceScore !== null">
+            ({{ Math.round(proposal.importanceScore * 100) }}%)
+          </template>
+        </p>
+        <p v-if="proposal.importanceReason" class="proposal-reason">
+          {{ proposal.importanceReason }}
         </p>
         <a :href="proposal.sourceItem.originalUrl" target="_blank" rel="noopener noreferrer">
           {{ t('admin.openSource') }}

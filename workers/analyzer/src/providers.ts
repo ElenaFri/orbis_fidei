@@ -9,8 +9,20 @@ const JSON_SCHEMA = {
     suggestedSummary: { type: 'string' },
     suggestedCategory: { type: 'string' },
     confidence: { type: 'number', minimum: 0, maximum: 1 },
+    importanceScore: { type: 'number', minimum: 0, maximum: 1 },
+    importanceLevel: { type: 'string', enum: ['HIGH', 'MEDIUM', 'LOW'] },
+    importanceReason: { type: 'string' },
   },
-  required: ['language', 'suggestedTitle', 'suggestedSummary', 'suggestedCategory', 'confidence'],
+  required: [
+    'language',
+    'suggestedTitle',
+    'suggestedSummary',
+    'suggestedCategory',
+    'confidence',
+    'importanceScore',
+    'importanceLevel',
+    'importanceReason',
+  ],
 } as const;
 
 export class FakeAIProvider implements AIProvider {
@@ -22,6 +34,9 @@ export class FakeAIProvider implements AIProvider {
       suggestedSummary: content.slice(0, 500) || item.originalTitle,
       suggestedCategory: 'other',
       confidence: 0.5,
+      importanceScore: 0.5,
+      importanceLevel: 'MEDIUM',
+      importanceReason: 'Default fake-provider assessment.',
     };
   }
 }
@@ -51,7 +66,7 @@ export class OpenAIProvider implements AIProvider {
           {
             role: 'system',
             content:
-              'Analyze the source item. Return JSON only. Preserve factual meaning, write a concise summary, choose one editorial category, and never publish anything.',
+              'Analyze the source item and return JSON only. Preserve factual meaning, write a concise summary, choose one editorial category, and never publish anything. Calibrate confidence conservatively: 0.90-1.00 only when the title and content are clear, coherent, and unambiguous; 0.70-0.89 when the analysis is probably correct but has limited context; 0.40-0.69 when important details are uncertain; below 0.40 when the item is incomplete, ambiguous, or difficult to classify. Do not use 0.95 as a default. Calibrate importance separately from confidence and explain both decisions.',
           },
           {
             role: 'user',

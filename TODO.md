@@ -186,7 +186,7 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - [x] Classification catégorie (provider IA/fake, catégorie de secours `other`)
 - [~] Détection doublons / similarité (déduplication SourceItem déjà faite ; similarité sémantique à approfondir)
 - [x] Génération résumé (via `AIProvider` abstrait)
-- [x] Création idempotente d'un `ArticleProposal`
+- [x] Création idempotente d'un `ArticleProposal` avec présélection IA (score/niveau/justification d'importance)
 
 ### 4.4 `workers/translator`
 
@@ -264,6 +264,6 @@ Objectif : jobs asynchrones découplés du backend via BullMQ.
 - **M2 — Backoffice minimal** ✅ : CRUD sources/catégories, création manuelle d'article (API + backoffice `/admin`).
 - **M3 — Interface publique** ✅ _socle livré_ : liste compacte, dépliage inline, détail `/a/:slug`, commentaires top-level, i18n FR/EN/RU. Recherche/filtres et réponses imbriquées restent à approfondir.
 - **M4 — Agrégation RSS** ✅ _socle aggregator livré_ : polling des sources actives, RSS/Atom, déduplication, `SourceItem`, jobs `analysis`. ETag reste à faire.
-- **M5 — IA (résumé + classification + doublons)** ✅ _socle analyzer livré_ : provider fake/OpenAI, résumé, catégorie, ArticleProposal idempotente. Similarité sémantique et embeddings restent à approfondir.
+- **M5 — IA (résumé + classification + doublons)** ✅ _socle analyzer livré_ : provider fake/OpenAI, résumé, catégorie, présélection transparente par importance, ArticleProposal idempotente. Similarité sémantique et embeddings restent à approfondir.
 - **M6 — Traduction automatique** ✅ _socle translator + modération livré_ : provider fake/OpenAI configurable, jobs EN/RU idempotents, propositions acceptables/rejetables, traductions machine marquées `TRANSLATED`. Relecture humaine et déclenchement événementiel fin restent à approfondir.
 - **M7 — MVP livrable** : tous les critères de la section 20 du cahier des charges.

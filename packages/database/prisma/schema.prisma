@@ -189,6 +189,9 @@ model ArticleProposal {
   suggestedSummary  String?
   suggestedCategory String?
   confidence        Float?
+  importanceScore   Float?
+  importanceLevel   String?
+  importanceReason  String?
   reviewedById      String?
   reviewedAt        DateTime?
   createdAt         DateTime       @default(now())

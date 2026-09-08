@@ -13,6 +13,9 @@ export interface AnalysisResult {
   suggestedSummary: string;
   suggestedCategory: string;
   confidence: number;
+  importanceScore: number;
+  importanceLevel: 'HIGH' | 'MEDIUM' | 'LOW';
+  importanceReason: string;
 }
 
 export interface AIProvider {
@@ -42,6 +45,17 @@ const SOURCE_ITEM_SELECT = {
 
 function normalizeResult(result: AnalysisResult): AnalysisResult {
   const confidence = Math.min(1, Math.max(0, Number(result.confidence) || 0));
+  const importanceScore = Math.min(1, Math.max(0, Number(result.importanceScore) || 0));
+  let importanceLevel: AnalysisResult['importanceLevel'];
+  if (['HIGH', 'MEDIUM', 'LOW'].includes(result.importanceLevel)) {
+    importanceLevel = result.importanceLevel;
+  } else if (importanceScore >= 0.7) {
+    importanceLevel = 'HIGH';
+  } else if (importanceScore >= 0.4) {
+    importanceLevel = 'MEDIUM';
+  } else {
+    importanceLevel = 'LOW';
+  }
   if (!result.suggestedTitle.trim() || !result.suggestedSummary.trim()) {
     throw new AnalyzerError('AI provider returned an empty title or summary.');
   }
@@ -51,6 +65,9 @@ function normalizeResult(result: AnalysisResult): AnalysisResult {
     suggestedSummary: result.suggestedSummary.trim(),
     suggestedCategory: result.suggestedCategory.trim() || 'other',
     confidence,
+    importanceScore,
+    importanceLevel,
+    importanceReason: String(result.importanceReason ?? '').trim() || 'No reason provided.',
   };
 }
 
@@ -82,6 +99,9 @@ export async function analyzeSourceItem(
           suggestedSummary: result.suggestedSummary,
           suggestedCategory: result.suggestedCategory,
           confidence: result.confidence,
+          importanceScore: result.importanceScore,
+          importanceLevel: result.importanceLevel,
+          importanceReason: result.importanceReason,
         },
         select: { id: true },
       });

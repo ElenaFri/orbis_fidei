@@ -124,6 +124,13 @@
     "noSuggestions": "No pending suggestions.",
     "category": "Category",
     "confidence": "Confidence",
+    "importance": "Importance",
+    "importanceLevels": {
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low",
+      "NOT_EVALUATED": "Not evaluated"
+    },
     "openSource": "Open source",
     "accept": "Accept",
     "reject": "Reject",

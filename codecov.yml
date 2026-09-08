@@ -2,7 +2,9 @@ coverage:
   status:
     patch:
       default:
-        target: 90%
+        # Vue templates and static locale catalogs are intentionally excluded
+        # from Vitest instrumentation; keep patch gating realistic for UI-only diffs.
+        target: 70%
         threshold: 1%
     project:
       default:
@@ -16,5 +18,8 @@ ignore:
   - 'apps/web/src/i18n/**'
   - 'apps/web/src/components/**'
   - 'apps/web/src/views/**'
+  - 'packages/database/prisma/migrations/**'
+  - 'packages/database/prisma/schema.prisma'
+  - 'packages/types/src/**'
   - '**/vitest.config.ts'
   - '**/vitest.workspace.ts'

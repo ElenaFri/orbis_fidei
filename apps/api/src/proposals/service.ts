@@ -21,7 +21,7 @@ export function listPendingProposals() {
   return prisma.articleProposal.findMany({
     where: { status: 'PENDING' },
     include: PROPOSAL_INCLUDE,
-    orderBy: { createdAt: 'asc' },
+    orderBy: [{ importanceScore: 'desc' }, { createdAt: 'asc' }],
   });
 }
 

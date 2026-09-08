@@ -93,6 +93,9 @@ describe('analyzeSourceItem', () => {
         suggestedSummary: 'Summary',
         suggestedCategory: 'other',
         confidence: 0.8,
+        importanceScore: 0.7,
+        importanceLevel: 'HIGH',
+        importanceReason: 'International public-interest event.',
       }),
     };
     const dependencies = createDependencies({ provider, maxAttempts: 2 });

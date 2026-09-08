@@ -123,6 +123,9 @@ export interface AdminProposal {
   suggestedSummary: string | null;
   suggestedCategory: string | null;
   confidence: number | null;
+  importanceScore: number | null;
+  importanceLevel: string | null;
+  importanceReason: string | null;
   createdAt: string;
   sourceItem: {
     id: string;
