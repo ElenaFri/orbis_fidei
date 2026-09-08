@@ -38,18 +38,26 @@ const auth = useAuthStore();
 .admin-layout {
   display: flex;
   gap: 2rem;
+  align-items: flex-start;
 }
 
 .admin-sidebar {
+  padding: 1rem;
+  background: var(--color-surface, #fffdf8);
+  border: 1px solid var(--color-border, #dcd4c8);
+  border-top: 3px solid var(--color-copper, #a87332);
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-width: 160px;
+  min-width: 190px;
 }
 
 .admin-sidebar a.router-link-active {
   font-weight: 700;
-  color: var(--color-accent, #1e40af);
+  color: var(--color-accent, #762f35);
+  border-left: 2px solid var(--color-copper, #a87332);
+  padding-left: 0.55rem;
 }
 
 .admin-content {

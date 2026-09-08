@@ -2,11 +2,16 @@
 .auth-view {
     max-width: 360px;
     margin: 0 auto;
+    padding: 1.5rem;
+    background: var(--color-surface, #fffdf8);
+    border: 1px solid var(--color-border, #dcd4c8);
+    border-top: 3px solid var(--color-copper, #a87332);
+    border-radius: 4px;
 }
 
 .auth-view .tabs {
     display: flex;
-    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    border-bottom: 1px solid var(--color-border, #dcd4c8);
     margin-bottom: 1.5rem;
 }
 
@@ -25,8 +30,8 @@
 }
 
 .auth-view .tabs button.active {
-    color: var(--color-accent, #1e40af);
-    border-bottom-color: var(--color-accent, #1e40af);
+    color: var(--color-accent, #762f35);
+    border-bottom-color: var(--color-accent, #762f35);
 }
 
 .auth-view form {
@@ -43,8 +48,8 @@
 
 .auth-view input {
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 4px;
+    border: 1px solid var(--color-border, #dcd4c8);
+    border-radius: 3px;
     font-size: 1rem;
 }
 
@@ -52,8 +57,8 @@
     margin-top: 1rem;
     padding: 0.6rem 1rem;
     border: none;
-    border-radius: 4px;
-    background: var(--color-accent, #1e40af);
+    border-radius: 3px;
+    background: var(--color-accent, #762f35);
     color: white;
     font-weight: 600;
     cursor: pointer;

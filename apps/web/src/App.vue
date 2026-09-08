@@ -55,13 +55,16 @@ const canAccessAdmin = computed(
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1rem 2rem;
+  padding: 1.1rem 2rem;
+  background: var(--color-surface, #fffdf8);
   border-bottom: 1px solid var(--color-border, #e5e7eb);
 }
 
 .app-title {
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 650;
+  font-size: 1.45rem;
+  letter-spacing: 0.01em;
   text-decoration: none;
   color: inherit;
 }
@@ -76,7 +79,8 @@ const canAccessAdmin = computed(
 .app-header nav a {
   color: var(--color-muted, #6b7280);
   text-decoration: none;
-  padding-bottom: 2px;
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
 }
 
 .app-header nav a:hover {
@@ -85,20 +89,21 @@ const canAccessAdmin = computed(
 
 /* Active tab highlighted — will be revisited with the final visual design. */
 .app-header nav a.router-link-exact-active {
-  color: var(--color-accent, #1e40af);
+  color: var(--color-accent, #762f35);
   font-weight: 700;
-  border-bottom: 2px solid var(--color-accent, #1e40af);
+  border-bottom: 2px solid var(--color-copper, #a87332);
 }
 
 .app-main {
-  padding: 2rem;
+  padding: 3rem 2rem 4rem;
   max-width: 1000px;
   margin: 0 auto;
   width: 100%;
 }
 
 .app-footer {
-  padding: 1rem 2rem;
+  padding: 1.2rem 2rem;
+  background: var(--color-surface, #fffdf8);
   border-top: 1px solid var(--color-border, #e5e7eb);
   color: #6b7280;
   font-size: 0.875rem;
