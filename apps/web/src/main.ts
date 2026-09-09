@@ -16,8 +16,5 @@ app.use(pinia);
 app.use(router);
 app.use(i18n);
 
-try {
-  await useAuthStore().init();
-} finally {
-  app.mount('#app');
-}
+app.mount('#app');
+void useAuthStore().init();

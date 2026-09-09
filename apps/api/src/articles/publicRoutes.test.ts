@@ -51,12 +51,12 @@ vi.mock('@orbis-fidei/database', () => ({
       findMany: vi.fn(
         async ({
           where: _where,
-          include,
+          select,
         }: {
           where: { translations: { some: { language: string } } };
-          include: { translations: { where: { language: string } } };
+          select: { translations: { where: { language: string } } };
         }) => {
-          const lang = include.translations.where.language;
+          const lang = select.translations.where.language;
           return [...articles.values()]
             .filter((a) => matches(a, lang))
             .map((a) => withRelations(a, lang));
@@ -71,12 +71,12 @@ vi.mock('@orbis-fidei/database', () => ({
       findFirst: vi.fn(
         async ({
           where,
-          include,
+          select,
         }: {
           where: { slug: string; translations: { some: { language: string } } };
-          include: { translations: { where: { language: string } } };
+          select: { translations: { where: { language: string } } };
         }) => {
-          const lang = include.translations.where.language;
+          const lang = select.translations.where.language;
           const article = [...articles.values()].find(
             (a) => a.slug === where.slug && matches(a, lang),
           );

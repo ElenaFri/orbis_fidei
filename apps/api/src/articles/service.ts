@@ -118,10 +118,23 @@ export async function listPublicArticles({ lang, page = 1 }: PublicArticleListPa
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
       where,
-      include: {
-        translations: { where: { language: lang } },
-        categories: { include: { category: true } },
-        source: true,
+      select: {
+        id: true,
+        slug: true,
+        originalLang: true,
+        publishedAt: true,
+        translations: {
+          where: { language: lang },
+          select: { language: true, title: true, summary: true },
+        },
+        categories: {
+          select: {
+            category: {
+              select: { id: true, key: true, labelFr: true, labelEn: true, labelRu: true },
+            },
+          },
+        },
+        source: { select: { name: true } },
         _count: { select: { comments: true } },
       },
       orderBy: { publishedAt: 'desc' },
@@ -138,13 +151,26 @@ export async function listPublicArticles({ lang, page = 1 }: PublicArticleListPa
 export async function getPublicArticleBySlug(slug: string, lang: Language) {
   const article = await prisma.article.findFirst({
     where: { slug, status: 'PUBLISHED', translations: { some: { language: lang } } },
-    include: {
-      translations: { where: { language: lang } },
-      categories: { include: { category: true } },
-      source: true,
+    select: {
+      id: true,
+      slug: true,
+      originalLang: true,
+      publishedAt: true,
+      translations: {
+        where: { language: lang },
+        select: { language: true, title: true, summary: true, analysis: true },
+      },
+      categories: {
+        select: {
+          category: {
+            select: { id: true, key: true, labelFr: true, labelEn: true, labelRu: true },
+          },
+        },
+      },
+      source: { select: { name: true, url: true } },
       proposal: {
-        include: {
-          sourceItem: true,
+        select: {
+          sourceItem: { select: { originalUrl: true } },
         },
       },
       _count: { select: { comments: true } },
