@@ -132,6 +132,7 @@ describe('public article routes', () => {
     expect(body.items).toHaveLength(1);
     expect(body.items[0].title).toBe('Mon article');
     expect(body.total).toBe(1);
+    expect(response.headers['cache-control']).toContain('max-age=60');
   });
 
   it('defaults to French and page 1 when no query params are given', async () => {
@@ -156,6 +157,7 @@ describe('public article routes', () => {
     expect(response.statusCode).toBe(200);
     expect(response.json().title).toBe('Mon article');
     expect(response.json().analysis).toBe('Analyse.');
+    expect(response.headers['cache-control']).toContain('max-age=300');
     expect(response.json().sourceUrl).toBe(
       'https://vaticannews.va/fr/pape/news/2026-09/actualite.html',
     );

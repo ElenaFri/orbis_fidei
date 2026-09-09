@@ -37,6 +37,14 @@ export class ApiError extends Error {
 let accessToken: string | null = null;
 /** Prevents concurrent refreshes (several requests failing with 401 at the same time). */
 let refreshPromise: Promise<boolean> | null = null;
+const PUBLIC_LIST_CACHE_TTL_MS = 60_000;
+const publicArticleListCache = new Map<
+  string,
+  {
+    expiresAt: number;
+    value: { items: PublicArticleListItem[]; total: number; page: number; pageSize: number };
+  }
+>();
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
@@ -156,10 +164,23 @@ export const api = {
   },
 
   publicArticles: {
-    list: (lang = 'FR', page = 1) =>
-      request<{ items: PublicArticleListItem[]; total: number; page: number; pageSize: number }>(
-        `/articles?lang=${lang}&page=${page}`,
-      ),
+    list: async (lang = 'FR', page = 1) => {
+      const cacheKey = `${lang}:${page}`;
+      const cached = publicArticleListCache.get(cacheKey);
+      if (cached && cached.expiresAt > Date.now()) return cached.value;
+
+      const value = await request<{
+        items: PublicArticleListItem[];
+        total: number;
+        page: number;
+        pageSize: number;
+      }>(`/articles?lang=${lang}&page=${page}`);
+      publicArticleListCache.set(cacheKey, {
+        value,
+        expiresAt: Date.now() + PUBLIC_LIST_CACHE_TTL_MS,
+      });
+      return value;
+    },
     get: (slug: string, lang = 'FR') =>
       request<PublicArticle>(`/articles/${encodeURIComponent(slug)}?lang=${lang}`),
   },

@@ -12,6 +12,8 @@ const ListQuerySchema = z.object({
 const DetailQuerySchema = z.object({
   lang: LanguageSchema.default('FR'),
 });
+const PUBLIC_LIST_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=300';
+const PUBLIC_DETAIL_CACHE_CONTROL = 'public, max-age=300, stale-while-revalidate=900';
 
 function toSummary(
   article: Awaited<ReturnType<typeof articleService.listPublicArticles>>['articles'][number],
@@ -47,6 +49,7 @@ export async function registerPublicArticleRoutes(app: FastifyInstance): Promise
     const { articles, total, page, pageSize } = await articleService.listPublicArticles(
       parsed.data,
     );
+    reply.header('Cache-Control', PUBLIC_LIST_CACHE_CONTROL);
     return { items: articles.map(toSummary), total, page, pageSize };
   });
 
@@ -64,6 +67,7 @@ export async function registerPublicArticleRoutes(app: FastifyInstance): Promise
       const translation = article.translations[0];
       const sourceUrl = article.proposal?.sourceItem?.originalUrl ?? article.source?.url;
 
+      reply.header('Cache-Control', PUBLIC_DETAIL_CACHE_CONTROL);
       return {
         ...toSummary(article),
         analysis: translation?.analysis ?? '',

@@ -348,6 +348,18 @@ describe('api client', () => {
     );
   });
 
+  it('publicArticles.list() réutilise la réponse en cache durant une minute', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ items: [], total: 0, page: 1, pageSize: 20 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.publicArticles.list('RU', 1);
+    await api.publicArticles.list('RU', 1);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('publicArticles.get() encode le slug', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 'a1' }));
     vi.stubGlobal('fetch', fetchMock);
