@@ -109,11 +109,37 @@ const PUBLIC_PAGE_SIZE = 20;
 export interface PublicArticleListParams {
   lang: Language;
   page?: number;
+  query?: string;
+  category?: string;
+  sourceId?: string;
 }
 
 /** Lists published articles that have a translation in the requested language. */
-export async function listPublicArticles({ lang, page = 1 }: PublicArticleListParams) {
-  const where = { status: 'PUBLISHED' as const, translations: { some: { language: lang } } };
+export async function listPublicArticles({
+  lang,
+  page = 1,
+  query,
+  category,
+  sourceId,
+}: PublicArticleListParams) {
+  const where = {
+    status: 'PUBLISHED' as const,
+    translations: {
+      some: {
+        language: lang,
+        ...(query
+          ? {
+              OR: [
+                { title: { contains: query, mode: 'insensitive' as const } },
+                { summary: { contains: query, mode: 'insensitive' as const } },
+              ],
+            }
+          : {}),
+      },
+    },
+    ...(category ? { categories: { some: { category: { key: category } } } } : {}),
+    ...(sourceId ? { sourceId } : {}),
+  };
 
   const [articles, total] = await Promise.all([
     prisma.article.findMany({

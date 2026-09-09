@@ -54,7 +54,11 @@
   "search": {
     "title": "Recherche",
     "placeholder": "Rechercher un article…",
-    "todo": "La recherche sera disponible dans une prochaine version."
+    "todo": "La recherche sera disponible dans une prochaine version.",
+    "submit": "Rechercher",
+    "allCategories": "Toutes les catégories",
+    "allSources": "Toutes les sources",
+    "empty": "Aucun article ne correspond à ces critères."
   },
   "notFound": {
     "title": "Page introuvable",

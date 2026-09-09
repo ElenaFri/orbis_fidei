@@ -348,6 +348,28 @@ describe('api client', () => {
     );
   });
 
+  it('publicArticles.list() ajoute les filtres de recherche à la requête', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ items: [], total: 0, page: 3, pageSize: 20 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await api.publicArticles.list('FR', 3, {
+      query: 'Vatican',
+      category: 'theology',
+      sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('query=Vatican'),
+      expect.anything(),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('category=theology'),
+      expect.anything(),
+    );
+  });
+
   it('publicArticles.list() réutilise la réponse en cache durant une minute', async () => {
     const fetchMock = vi
       .fn()

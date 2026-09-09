@@ -7,6 +7,9 @@ import * as articleService from './service.js';
 const ListQuerySchema = z.object({
   lang: LanguageSchema.default('FR'),
   page: z.coerce.number().int().positive().default(1),
+  query: z.string().trim().min(2).max(120).optional(),
+  category: z.string().trim().min(2).max(60).optional(),
+  sourceId: z.string().cuid().optional(),
 });
 
 const DetailQuerySchema = z.object({

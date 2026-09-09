@@ -54,7 +54,11 @@
   "search": {
     "title": "Search",
     "placeholder": "Search for an article…",
-    "todo": "Search will be available in a future release."
+    "todo": "Search will be available in a future release.",
+    "submit": "Search",
+    "allCategories": "All categories",
+    "allSources": "All sources",
+    "empty": "No articles match these criteria."
   },
   "notFound": {
     "title": "Page not found",

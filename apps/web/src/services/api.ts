@@ -164,8 +164,16 @@ export const api = {
   },
 
   publicArticles: {
-    list: async (lang = 'FR', page = 1) => {
-      const cacheKey = `${lang}:${page}`;
+    list: async (
+      lang = 'FR',
+      page = 1,
+      filters: { query?: string; category?: string; sourceId?: string } = {},
+    ) => {
+      const parameters = new URLSearchParams({ lang, page: String(page) });
+      if (filters.query) parameters.set('query', filters.query);
+      if (filters.category) parameters.set('category', filters.category);
+      if (filters.sourceId) parameters.set('sourceId', filters.sourceId);
+      const cacheKey = parameters.toString();
       const cached = publicArticleListCache.get(cacheKey);
       if (cached && cached.expiresAt > Date.now()) return cached.value;
 
@@ -174,7 +182,7 @@ export const api = {
         total: number;
         page: number;
         pageSize: number;
-      }>(`/articles?lang=${lang}&page=${page}`);
+      }>(`/articles?${parameters}`);
       publicArticleListCache.set(cacheKey, {
         value,
         expiresAt: Date.now() + PUBLIC_LIST_CACHE_TTL_MS,

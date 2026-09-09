@@ -5,11 +5,20 @@
 [![CI](https://github.com/ElenaFri/orbis_fidei/actions/workflows/ci.yml/badge.svg)](https://github.com/ElenaFri/orbis_fidei/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/ElenaFri/orbis_fidei/graph/badge.svg?token=7LQOKQAesk)](https://codecov.io/gh/ElenaFri/orbis_fidei)
 
-Orbis Fidei est un portail international d'actualités religieuses, disponible en français, anglais et russe.
+Orbis Fidei est un portail international d'actualités chrétiennes et spirituelles, disponible en français, anglais et russe.
 
-Le projet vise à agréger automatiquement des informations provenant de médias chrétiens du monde entier, à les soumettre à une équipe de modération, puis à publier des contenus vérifiés et édités dans les trois langues du portail.
+Il collecte des flux RSS/Atom, crée des propositions assistées par IA, laisse une équipe éditoriale les relire, puis publie des articles et leurs traductions. L'IA n'est jamais autorisée à publier seule.
 
-L'automatisation intervient dans la collecte, l'analyse et la traduction, mais la publication reste sous contrôle humain.
+## Fonctionnalités disponibles
+
+- Agrégation périodique de sources RSS/Atom, déduplication et file de traitement.
+- Analyse IA configurable : résumé, catégorie proposée, confiance et présélection par importance.
+- File de modération des suggestions : acceptation ou rejet, avec traçabilité.
+- Articles brouillon et publiés, édition ciblée, catégories, lien vers l'article original et traduction EN/RU après publication.
+- Recherche publique par texte, catégorie et source ; filtres de catégories depuis l'accueil.
+- Commentaires imbriqués, réponses, édition/suppression par l'auteur et modération.
+- Gestion des utilisateurs, rôles et permissions dans le backoffice.
+- Sécurité : RBAC, cookies refresh httpOnly, CSP, rate limiting, audit persistant et audit des dépendances CI.
 
 ---
 

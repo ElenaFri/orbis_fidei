@@ -135,6 +135,18 @@ describe('public article routes', () => {
     expect(response.headers['cache-control']).toContain('max-age=60');
   });
 
+  it('accepts text, category, and source filters', async () => {
+    seedPublished({ slug: 'mon-article', title: 'Vatican news' });
+    const app = await buildTestApp();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/articles?lang=FR&query=Vatican&category=theology&sourceId=cmtpmv9oi0001s3izdop1zzu7',
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
   it('defaults to French and page 1 when no query params are given', async () => {
     seedPublished();
     const app = await buildTestApp();
