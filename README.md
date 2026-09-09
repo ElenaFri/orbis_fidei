@@ -71,7 +71,13 @@ sous contrôle éditorial humain.
 
 Voir [TODO.md](TODO.md) pour la feuille de route détaillée.
 
----
+## Déploiement
+
+Le dépôt contient une stack Docker de production : API, frontend, workers RSS/analyzer/translator, PostgreSQL et Redis. Les bases de données ne sont jamais exposées publiquement ; le frontend et l'API sont liés seulement à `127.0.0.1` pour être servis par un reverse proxy TLS.
+
+La procédure complète, les variables de production, les migrations, les sauvegardes et les exigences de reverse proxy sont détaillées dans [docs/deployment.md](docs/deployment.md).
+
+Avant une ouverture publique, il faut encore choisir l'hébergeur et le domaine, configurer TLS, définir des sauvegardes hors machine et mettre en place une supervision externe.
 
 ## Structure du dépôt
 
