@@ -98,6 +98,19 @@ export async function publishArticle(id: string) {
   return article;
 }
 
+export async function archiveArticle(id: string) {
+  const current = await getArticle(id);
+  if (current.status === 'ARCHIVED') return current;
+
+  const article = await prisma.article.update({
+    where: { id },
+    data: { status: 'ARCHIVED' },
+    include: ARTICLE_INCLUDE,
+  });
+  await recordEditorialAction({ action: 'ARTICLE_ARCHIVED', articleId: id });
+  return article;
+}
+
 export async function deleteArticle(id: string): Promise<void> {
   await getArticle(id);
   await prisma.article.delete({ where: { id } });

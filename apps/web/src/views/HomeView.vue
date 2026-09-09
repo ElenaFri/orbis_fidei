@@ -98,4 +98,20 @@ onMounted(loadArticles);
 .error {
   color: #b91c1c;
 }
+
+.active-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.active-filter button {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--color-border, #dcd4c8);
+  border-radius: 3px;
+  background: var(--color-surface, #fffdf8);
+  color: var(--color-accent, #762f35);
+  cursor: pointer;
+}
 </style>

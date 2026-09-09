@@ -348,6 +348,26 @@ describe('publishArticle', () => {
   });
 });
 
+describe('archiveArticle', () => {
+  afterEach(() => {
+    articles.clear();
+    translations.length = 0;
+    articleCategories.length = 0;
+  });
+
+  it('marks a published article as archived', async () => {
+    const created = await service.createArticle(
+      { slug: 'to-archive', originalLang: 'FR', categoryIds: [], translations: [baseTranslation] },
+      'user_1',
+    );
+    await service.publishArticle(created.id);
+
+    const archived = await service.archiveArticle(created.id);
+
+    expect(archived.status).toBe('ARCHIVED');
+  });
+});
+
 describe('deleteArticle', () => {
   afterEach(() => {
     articles.clear();

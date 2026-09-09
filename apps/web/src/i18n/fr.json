@@ -122,6 +122,8 @@
     "filterStatus": "Filtrer par statut",
     "allStatuses": "Tous les statuts",
     "publish": "Approuver et publier",
+    "archive": "Archiver",
+    "confirmArchiveArticle": "Archiver cet article ? Il ne sera plus visible publiquement.",
     "confirmPublishArticle": "Approuver et publier cet article ?",
     "confirmDeleteArticle": "Supprimer cet article, même s'il est publié ? Cette action est irréversible.",
     "error": "Une erreur est survenue.",

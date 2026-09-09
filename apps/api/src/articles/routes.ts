@@ -110,6 +110,21 @@ export async function registerArticleRoutes(app: FastifyInstance): Promise<void>
     },
   );
 
+  app.post<{ Params: { id: string } }>(
+    '/admin/articles/:id/archive',
+    { preHandler: requirePermission('article.archive') },
+    async (request, reply) => {
+      try {
+        return await articleService.archiveArticle(request.params.id);
+      } catch (error) {
+        if (error instanceof articleService.ArticleError) {
+          return reply.code(error.statusCode).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
   app.delete<{ Params: { id: string } }>(
     '/admin/articles/:id',
     { preHandler: requirePermission('article.edit') },

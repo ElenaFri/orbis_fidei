@@ -185,6 +185,15 @@ async function publishArticle() {
   }
 }
 
+async function archiveArticle() {
+  if (!article.value || !window.confirm(t('admin.confirmArchiveArticle'))) return;
+  try {
+    article.value = await api.articles.archive(article.value.id);
+  } catch (err) {
+    error.value = err instanceof ApiError ? err.message : t('admin.error');
+  }
+}
+
 onMounted(loadArticle);
 </script>
 
@@ -220,6 +229,14 @@ onMounted(loadArticle);
         @click="publishArticle"
       >
         {{ t('admin.publish') }}
+      </button>
+      <button
+        v-if="article.status === 'PUBLISHED'"
+        type="button"
+        class="archive-button"
+        @click="archiveArticle"
+      >
+        {{ t('admin.archive') }}
       </button>
 
       <section class="editable-section" @click="startEdit('slug')">
@@ -381,6 +398,10 @@ onMounted(loadArticle);
 .publish-button {
   margin-top: 1rem;
   background: #166534;
+}
+.archive-button {
+  margin: 1rem 0 0 0.5rem;
+  background: var(--color-copper, #a87332);
 }
 .sr-only {
   position: absolute;

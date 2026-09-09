@@ -295,13 +295,15 @@ onMounted(loadArticles);
 
     <p v-if="error" class="error">{{ error }}</p>
 
-    <label for="article-status-filter">{{ t('admin.filterStatus') }}</label>
-    <select id="article-status-filter" v-model="statusFilter" class="status-filter">
-      <option value="ALL">{{ t('admin.allStatuses') }}</option>
-      <option value="DRAFT">{{ statusLabel('DRAFT') }}</option>
-      <option value="PUBLISHED">{{ statusLabel('PUBLISHED') }}</option>
-      <option value="ARCHIVED">{{ statusLabel('ARCHIVED') }}</option>
-    </select>
+    <div class="filter-control">
+      <label for="article-status-filter">{{ t('admin.filterStatus') }}</label>
+      <select id="article-status-filter" v-model="statusFilter" class="status-filter">
+        <option value="ALL">{{ t('admin.allStatuses') }}</option>
+        <option value="DRAFT">{{ statusLabel('DRAFT') }}</option>
+        <option value="PUBLISHED">{{ statusLabel('PUBLISHED') }}</option>
+        <option value="ARCHIVED">{{ statusLabel('ARCHIVED') }}</option>
+      </select>
+    </div>
 
     <p v-if="articles.length === 0">{{ t('admin.noArticles') }}</p>
     <table v-else>
@@ -351,8 +353,14 @@ onMounted(loadArticles);
 
 <style scoped>
 .status-filter {
-  margin: 0.5rem 0 1rem;
   padding: 0.4rem 0.6rem;
+}
+
+.filter-control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
 }
 
 .article-actions {

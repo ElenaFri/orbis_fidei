@@ -122,6 +122,8 @@
     "filterStatus": "Filter by status",
     "allStatuses": "All statuses",
     "publish": "Approve and publish",
+    "archive": "Archive",
+    "confirmArchiveArticle": "Archive this article? It will no longer be publicly visible.",
     "confirmPublishArticle": "Approve and publish this article?",
     "confirmDeleteArticle": "Delete this article, even though it may be published? This action cannot be undone.",
     "error": "Something went wrong.",

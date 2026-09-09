@@ -339,6 +339,31 @@ describe('article routes', () => {
     );
   });
 
+  it('archives an article with article.archive permission', async () => {
+    const app = await buildTestApp();
+    const created = await app.inject({
+      method: 'POST',
+      url: '/admin/articles',
+      headers: { authorization: `Bearer ${await tokenWith(['article.create'])}` },
+      payload: {
+        slug: 'to-archive',
+        sourceId: 'cmtpmv9oi0001s3izdop1zzu7',
+        originalLang: 'FR',
+        translations: [validTranslation],
+      },
+    });
+    const { id } = created.json();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/admin/articles/${id}/archive`,
+      headers: { authorization: `Bearer ${await tokenWith(['article.archive'])}` },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().status).toBe('ARCHIVED');
+  });
+
   it('keeps publication successful when translation enqueue fails', async () => {
     addTranslationJob.mockRejectedValueOnce(new Error('Redis unavailable'));
     const app = await buildTestApp();

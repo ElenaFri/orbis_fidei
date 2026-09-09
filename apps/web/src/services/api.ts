@@ -160,6 +160,8 @@ export const api = {
       }),
     publish: (id: string) =>
       request<AdminArticle>(`/admin/articles/${id}/publish`, { method: 'POST' }),
+    archive: (id: string) =>
+      request<AdminArticle>(`/admin/articles/${id}/archive`, { method: 'POST' }),
     remove: (id: string) => request<void>(`/admin/articles/${id}`, { method: 'DELETE' }),
   },
 
